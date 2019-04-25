@@ -1,0 +1,368 @@
+<div *ngIf="gameInProgress" class="container-fluid interactions">
+  <div class="row align-items-center justify-content-center no-gutters game-players">
+    <div class="card game-player" *ngFor="let gp of gameState.players"
+      [ngClass]="gp.id === gameState.currentPlayer.id ? 'Player-Border-' + gp.color : ''">
+      <div class="card-body">
+        <div class="name">
+          <fa-icon class="drawing" [ngClass]="'Player-'+ gp.color" [icon]="faUser"></fa-icon>
+          <span [ngClass]="gp.id === gameState.currentPlayer.id ? '' : 'gray'">{{gp.name}}</span>
+        </div>
+        <div class="timer">
+          <ngb-progressbar *ngIf="gameState.currentPlayer.id !== gp.id" type="info" [value]="0" [max]="45">
+          </ngb-progressbar>
+          <ngb-progressbar
+            *ngIf="getPlayerTimerProgressBarType(gameState.currentPlayer.currentTurnElapsedSeconds) === 'success' && gameState.currentPlayer.id === gp.id"
+            type="success" [value]="45-gameState.currentPlayer.currentTurnElapsedSeconds" [max]="45"></ngb-progressbar>
+          <ngb-progressbar
+            *ngIf="getPlayerTimerProgressBarType(gameState.currentPlayer.currentTurnElapsedSeconds) === 'warning' && gameState.currentPlayer.id === gp.id"
+            type="warning" [value]="45-gameState.currentPlayer.currentTurnElapsedSeconds" [max]="45"></ngb-progressbar>
+          <ngb-progressbar
+            *ngIf="getPlayerTimerProgressBarType(gameState.currentPlayer.currentTurnElapsedSeconds) === 'danger'  && gameState.currentPlayer.id === gp.id"
+            type="danger" [value]="45-gameState.currentPlayer.currentTurnElapsedSeconds" [max]="45"></ngb-progressbar>
+        </div>
+        <div class="money">
+          <fa-icon class="drawing" [ngClass]="gp.id === gameState.currentPlayer.id ? 'green-money' : 'gray'"
+            [icon]="faMoneyBillWave"></fa-icon>
+          <span
+            [ngClass]="gp.id === gameState.currentPlayer.id ? getMoneyColor(gp.money) : 'gray'">{{gp.money | currency : 'USD' : 'symbol' : '1.0'}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row align-items-center justify-content-center no-gutters game-events">
+
+  </div>
+  <div class="row align-items-center justify-content-center no-gutters action-btns">
+    <div class="col center-cust">
+      <div class="row align-items-center justify-content-center">
+        <div
+          [ngClass]="rollBtnEnabled ? 'dice-active Player-Dice-' + gameState.currentPlayer.color : 'dice-disabled Player-Dice-' + gameState.currentPlayer.color"
+          (click)="rollDice()">
+          <span class="dice" *ngFor="let dice of lastDiceRoll">
+            <fa-icon *ngIf="dice == 1" class="drawing" [icon]="faDiceOne"></fa-icon>
+            <fa-icon *ngIf="dice == 2" class="drawing" [icon]="faDiceTwo"></fa-icon>
+            <fa-icon *ngIf="dice == 3" class="drawing" [icon]="faDiceThree"></fa-icon>
+            <fa-icon *ngIf="dice == 4" class="drawing" [icon]="faDiceFour"></fa-icon>
+            <fa-icon *ngIf="dice == 5" class="drawing" [icon]="faDiceFive"></fa-icon>
+            <fa-icon *ngIf="dice == 6" class="drawing" [icon]="faDiceSix"></fa-icon>
+          </span>
+        </div>
+      </div>
+      <div class="row align-items-center justify-content-center">
+        <div class="btn-group-vertical">
+          <button type="button" class="btn btn-lg btn-danger" [ngClass]="!endTurnBtnEnabled ? 'disabled': 'done-btn'"
+            (click)="endTurn()">End Turn</button>
+          <button *ngIf="gamePlayer && 0 > gamePlayer.money" type="button" class="btn btn-lg btn-danger" [ngClass]="gameInProgress && gameState.currentPlayer.id !== this.gamePlayerId ? 'disabled': ''"
+            (click)="declareBankruptcy()">Bankruptcy</button>
+        </div>
+      </div>
+    </div>
+    <div class="col center-cust">
+      <div class="row align-items-center justify-content-around">
+        <button type="button" class="btn btn-lg btn-success" [ngClass]="!buildBtnEnabled ? 'disabled': 'build-btn'"
+          (click)="startBuild()">Build</button>
+        <button type="button" class="btn btn-lg btn-warning" [ngClass]="!sellBtnEnabled ? 'disabled': 'sell-btn'"
+          (click)="startSell()">Sell</button>
+        <button type="button" class="btn btn-lg btn-info" [ngClass]="!tradeBtnEnabled ? 'disabled': 'trade-btn'"
+          (click)="openTradeModal(tradeModalContent)">Trade</button>
+        <button type="button" class="btn btn-lg btn-info" [ngClass]="!viewOffersBtnEnabled ? 'disabled': 'trade-btn'"
+          (click)="openTradeOffersModal(tradeOffersModalContent)">View Offers</button>
+      </div>
+      <div class="row align-items-center justify-content-around">
+        <button type="button" class="btn btn-lg btn-warning"
+          [ngClass]="!mortgageBtnEnabled ? 'disabled': 'mortgage-btn'" (click)="startMortgage()">Mortgage</button>
+        <button type="button" class="btn btn-lg btn-success" [ngClass]="!redeemBtnEnabled ? 'disabled': 'redeem-btn'"
+          (click)="startRedeem()">Redeem</button>
+        <button type="button" class="btn btn-lg btn-primary"
+          [ngClass]="!payJailFeeBtnEnabled ? 'disabled': 'payJailFee-btn'" (click)="payJailFee()">Pay Jail Fee</button>
+        <button type="button" class="btn btn-lg btn-primary"
+          [ngClass]="!getOutOfJailFreeBtnEnabled ? 'disabled': 'get-out-of-jail-free-btn'"
+          (click)="useGetOutOfJailFreeCard()">Use GOJF Card</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #propertyBuyModalContent>
+  <div class="property-card-view">
+    <div class="modal-header"
+      [ngClass]="'Border-Bottom-' + (gameState.currentTile.color ? gameState.currentTile.color : gameState.currentTile.type)">
+      <h4 class="modal-title">FOR SALE</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row property-card">
+        <div class="col-8 details">
+          <div class="card text-center"
+            [ngClass]="'Tile-Border-' + (gameState.currentTile.color ? gameState.currentTile.color : gameState.currentTile.type)">
+            <div class="card-header"
+              [ngClass]="'Tile-' + (gameState.currentTile.color ? gameState.currentTile.color : gameState.currentTile.type)">
+              <span class="card-title">{{gameState.currentTile.name}}</span>
+            </div>
+            <div class="card-body">
+              <p *ngIf="gameState.currentTile.type === 'ColorProperty'" class="rent">Rent:
+                {{gameState.currentTile.rent | currency : 'USD' : 'symbol' : '1.0'}}</p>
+              <p *ngIf="gameState.currentTile.type !== 'ColorProperty'" class="rent">Rent</p>
+              <div *ngIf="gameState.currentTile.type === 'ColorProperty'" class="rents">
+                <p>With 1 House:
+                  {{gameState.currentTile.rentAmountPerBuilding[1] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With 2 Houses:
+                  {{gameState.currentTile.rentAmountPerBuilding[2] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With 3 Houses:
+                  {{gameState.currentTile.rentAmountPerBuilding[3] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With 4 Houses:
+                  {{gameState.currentTile.rentAmountPerBuilding[4] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With HOTEL: {{gameState.currentTile.rentAmountPerBuilding[5] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+              </div>
+              <div *ngIf="gameState.currentTile.type === 'Railroad'" class="rents">
+                <p>1 Railroad: $25</p>
+                <p>2 Railroads: $50</p>
+                <p>3 Railroads: $100</p>
+                <p>4 Railroads: $200</p>
+              </div>
+              <div *ngIf="gameState.currentTile.type === 'Utilities'" class="rents">
+                <p>1 Utility: $7 x Roll</p>
+                <p>2 Utilities: $14 x Roll</p>
+              </div>
+              <div class="info">
+                <p>Mortgage Value: {{gameState.currentTile.mortgageValue | currency : 'USD' : 'symbol' : '1.0'}}</p>
+                <p>Redeem Value: {{gameState.currentTile.redeemValue | currency : 'USD' : 'symbol' : '1.0'}}</p>
+              </div>
+              <div class="info">
+                <p *ngIf="gameState.currentTile.type === 'ColorProperty'">Houses Cost
+                  {{gameState.currentTile.buildingCost | currency : 'USD' : 'symbol' : '1.0'}} each</p>
+                <p *ngIf="gameState.currentTile.type === 'ColorProperty'">Hotels Cost
+                  {{gameState.currentTile.buildingCost | currency : 'USD' : 'symbol' : '1.0'}} each</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 align-self-center btns">
+          <p class="wallet">Bank: <span
+              [ngClass]="getMoneyColor(gamePlayer.money)">{{gamePlayer.money | currency : 'USD' : 'symbol' : '1.0'}}</span>
+          </p>
+          <p class="price">Price: {{gameState.currentTile.cost | currency : 'USD' : 'symbol' : '1.0'}}</p>
+          <button type="button" class="btn btn-block btn-primary" [ngClass]="{'disabled' : !canAfford}"
+            (click)="buyProperty()">Buy</button>
+          <button type="button" class="btn btn-block btn-warning" (click)="auctionProperty()">Auction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #propertyAuctionModalContent>
+  <div class="property-card-view">
+    <div class="modal-header"
+      [ngClass]="'Border-Bottom-' + (gameState.currentTile.color ? gameState.currentTile.color : gameState.currentTile.type)">
+      <h4 class="modal-title">AUCTION</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row property-card">
+        <div class="col-8 details">
+          <div class="card text-center" [ngClass]="'Tile-Border-' + gameState.currentTile.color">
+            <div class="card-header" [ngClass]="'Tile-' + gameState.currentTile.color">
+              <span class="card-title">{{gameState.currentTile.name}}</span>
+            </div>
+            <div class="card-body">
+              <p *ngIf="gameState.currentTile.type === 'ColorProperty'" class="rent">Rent:
+                {{gameState.currentTile.rent | currency : 'USD' : 'symbol' : '1.0'}}</p>
+              <p *ngIf="gameState.currentTile.type !== 'ColorProperty'" class="rent">Rent</p>
+              <div *ngIf="gameState.currentTile.type === 'ColorProperty'" class="rents">
+                <p>With 1 House:
+                  {{gameState.currentTile.rentAmountPerBuilding[1] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With 2 Houses:
+                  {{gameState.currentTile.rentAmountPerBuilding[2] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With 3 Houses:
+                  {{gameState.currentTile.rentAmountPerBuilding[3] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With 4 Houses:
+                  {{gameState.currentTile.rentAmountPerBuilding[4] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+                <p>With HOTEL: {{gameState.currentTile.rentAmountPerBuilding[5] | currency : 'USD' : 'symbol' : '1.0'}}
+                </p>
+              </div>
+              <div *ngIf="gameState.currentTile.type === 'Railroad'" class="rents">
+                <p>1 Railroad: $25</p>
+                <p>2 Railroads: $50</p>
+                <p>3 Railroads: $100</p>
+                <p>4 Railroads: $200</p>
+              </div>
+              <div *ngIf="gameState.currentTile.type === 'Utilities'" class="rents">
+                <p>1 Utility: $7 x Roll</p>
+                <p>2 Utilities: $14 x Roll</p>
+              </div>
+              <div class="info">
+                <p>Mortgage Value: {{gameState.currentTile.mortgageValue | currency : 'USD' : 'symbol' : '1.0'}}</p>
+                <p>Redeem Value: {{gameState.currentTile.redeemValue | currency : 'USD' : 'symbol' : '1.0'}}</p>
+              </div>
+              <div class="info">
+                <p *ngIf="gameState.currentTile.type === 'ColorProperty'">Houses Cost
+                  {{gameState.currentTile.buildingCost | currency : 'USD' : 'symbol' : '1.0'}} each</p>
+                <p *ngIf="gameState.currentTile.type === 'ColorProperty'">Hotels Cost
+                  {{gameState.currentTile.buildingCost | currency : 'USD' : 'symbol' : '1.0'}} each</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 align-self-center btns">
+          <p class="wallet" [ngClass]="getMoneyColor(gamePlayer.money)">Bank:
+            {{gamePlayer.money | currency : 'USD' : 'symbol' : '1.0'}}</p>
+          <p class="price">Price: {{gameState.currentTile.cost | currency : 'USD' : 'symbol' : '1.0'}}</p>
+          <form id="betForm" #betForm="ngForm" (ngSubmit)="betOnAuction(betForm.value.bet)">
+            <input class="form-control" type="number" id="bet" name="bet" ngModel>
+          </form>
+          <button type="submit" class="btn btn-block btn-primary bet" form="betForm">Bet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #tradeModalContent>
+  <div class="trade">
+    <div class="modal-header">
+      <h4 class="modal-title">CREATE OFFER</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col you">
+          <div class="row align-items-start justify-content-center trade-title">
+            <div class="d-inline-block">
+              <button type="button"
+                class="btn btn-outline-primary player-name-btn">{{ tradeMyPlayerAllProperties && tradeMyPlayerAllProperties.length > 1 ? " Your Properties" : "Your Property"}}</button>
+            </div>
+          </div>
+          <div class="row align-items-center justify-content-center trade-props-money">
+            <div class="offer">
+              <div class="props">
+                <div *ngFor="let playerProp of tradeMyPlayerAllProperties">
+                  <label class="text-center prop-name"
+                    [ngClass]="playerProp.color ?  'Tile-' + playerProp.color : playerProp.type  === 'Railroad' ? 'Tile-Railroad' : 'Tile-Utility'">
+                    <span>{{playerProp.name}}</span>
+                    <input class="prop-check-box" type="checkbox" [checked]="propertyAdded(playerProp.id)"
+                      (click)="tradeProperty(playerProp.id)">
+                  </label>
+                </div>
+              </div>
+              <div class="money">
+                <input type="number" placeholder="Send Money" [(ngModel)]="tradeMyPlayerMoney">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col them">
+          <div class="row align-items-start justify-content-center trade-title">
+            <div ngbDropdown class="d-inline-block">
+              <button type="button" class="btn btn-outline-primary"
+                [ngClass]="'Player-Border-' + (tradeTargetPlayer ? tradeTargetPlayer.color : '')"
+                ngbDropdownToggle>{{tradeTargetPlayer && tradeTargetPlayerAllProperties ? tradeTargetPlayerAllProperties.length > 1 ? tradeTargetPlayer.name + "'s Properties" : tradeTargetPlayer.name + "'s Property" : 'Trade With'}}</button>
+              <div ngbDropdownMenu>
+                <button type="button" ngbDropdownItem *ngFor="let player of tradePlayers"
+                  (click)="setTradePlayer(player.id)" [ngClass]="'Player-' + player.color">{{player.name}}</button>
+              </div>
+            </div>
+          </div>
+          <div class="row align-items-center justify-content-center trade-props-money">
+            <div class="offer">
+              <div class="props" *ngIf="tradeTargetPlayerAllProperties">
+                <div *ngFor="let playerProp of tradeTargetPlayerAllProperties">
+                  <label class="text-center prop-name"
+                    [ngClass]="playerProp.color ?  'Tile-' + playerProp.color : playerProp.type  === 'Railroad' ? 'Tile-Railroad' : 'Tile-Utility'">
+                    <input class="prop-check-box" type="checkbox" name="{{'cb-' + playerProp.id}}"
+                      [checked]="propertyAdded(playerProp.id)" (click)="tradeProperty(playerProp.id)">
+                    <span>{{playerProp.name}}</span>
+                  </label>
+                </div>
+              </div>
+              <div class="money" *ngIf="tradeTargetPlayer">
+                <input type="number" placeholder="Recieve Money" [(ngModel)]="tradeTargetPlayerMoney">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="sendOffer()">Send</button>
+      <button class="btn btn-danger" (click)="closeTradeModal()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #tradeOffersModalContent>
+  <div class="view-offer">
+    <div class="modal-header">
+      <h4 class="modal-title">YOUR OFFERS</h4>
+    </div>
+    <div class="modal-body">
+      <div class="row offers">
+        <div class="col offer" *ngFor="let offer of offers">
+          <div class="card" [ngClass]="'Player-Border-' + offer.playerA.color">
+            <div class="card-header text-center"
+              [ngClass]="(offer.playerA.id === gamePlayerId ? 'sent' : 'recieved') + '-offer'">
+              {{offer.playerA.id === gamePlayerId ? 'SENT TO: ' + offer.playerB.name : 'RECIEVED FROM: ' + offer.playerA.name}}
+            </div>
+            <div class="card-body">
+              <div class="sending">
+                <div class="card-title">
+                  {{offer.playerA.id === gamePlayerId ? 'Sent' : 'Send'}}
+                </div>
+                <div class="props text-center">
+                  <div *ngIf="offer.playerA.id === gamePlayerId">
+                    <div *ngFor="let playerAProp of offer.playerAProperties" class="text-center prop-name"
+                      [ngClass]="playerAProp.color ?  'Tile-' + playerAProp.color : playerAProp.type  === 'Railroad' ? 'Tile-Railroad' : 'Tile-Utility'">
+                      {{playerAProp.name}}
+                    </div>
+                    <div *ngIf="offer.moneyAB > 0">{{'$' + offer.moneyAB}}</div>
+                  </div>
+                  <div *ngIf="offer.playerA.id !== gamePlayerId">
+                    <div *ngFor="let playerBProp of offer.playerBProperties" class="text-center prop-name"
+                      [ngClass]="playerBProp.color ?  'Tile-' + playerBProp.color : playerBProp.type  === 'Railroad' ? 'Tile-Railroad' : 'Tile-Utility'">
+                      {{playerBProp.name}}
+                    </div>
+                    <div *ngIf="0 > offer.moneyAB">{{'$' + offer.moneyAB * -1}}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="recieving">
+                <div class="card-title">Recieve</div>
+                <div class="props text-center">
+                  <div *ngIf="offer.playerA.id !== gamePlayerId">
+                    <div *ngFor="let playerAProp of offer.playerAProperties" class="text-center prop-name"
+                      [ngClass]="playerAProp.color ?  'Tile-' + playerAProp.color : playerAProp.type  === 'Railroad' ? 'Tile-Railroad' : 'Tile-Utility'">
+                      {{playerAProp.name}}
+                    </div>
+                    <div *ngIf="offer.moneyAB > 0">{{'$' + offer.moneyAB}}</div>
+                  </div>
+                  <div *ngIf="offer.playerA.id === gamePlayerId">
+                    <div *ngFor="let playerBProp of offer.playerBProperties" class="text-center prop-name"
+                      [ngClass]="playerBProp.color ?  'Tile-' + playerBProp.color : playerBProp.type  === 'Railroad' ? 'Tile-Railroad' : 'Tile-Utility'">
+                      {{playerBProp.name}}
+                    </div>
+                    <div *ngIf="0 > offer.moneyAB">{{'$' + offer.moneyAB * -1}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer text-center">
+              <button [ngClass]="{'disabled' : offer.playerA.id === gamePlayerId}" class="btn btn-primary"
+                (click)="acceptOffer(offer.id, offer.playerA.id)">Accept</button>
+              <button [ngClass]="{'disabled' : offer.playerA.id === gamePlayerId}" class="btn btn-danger"
+                (click)="rejectOffer(offer.id, offer.playerA.id)">Decline</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-info" (click)="closeTradeOffersModal()">Close</button>
+    </div>
+  </div>
+</ng-template>

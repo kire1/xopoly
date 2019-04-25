@@ -1,0 +1,111 @@
+<div class="menu">
+    <fa-icon class="gray" [icon]="isLobbyCollapsed ? faCaretSquareUp : faCaretSquareDown"
+        (click)="toggleLobby()"></fa-icon>
+</div>
+<div class="row justify-content-md-center lobby">
+    <div class="players col">
+        <div class="card">
+            <div class="card-header">
+                <span>Players</span>
+                <fa-icon [ngClass]="isPlayerRegistered ? 'gray' : 'green'" [icon]="faPlus"
+                    (click)="openAddPlayerModal(addPlayerModalContent)" class="icon-action"></fa-icon>
+            </div>
+            <div class="card-body" [ngbCollapse]="isLobbyCollapsed || (gameInProgress && !manuallyOpenedLobby)">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item card-text" *ngFor="let player of lobbyState.players">
+                        <fa-icon class="icon-no-action"
+                            [ngClass]="lobbyState.player.computerUserID === player.computerUserID ? 'blue' : 'gray'"
+                            [icon]="faUser"></fa-icon>
+                        {{ player.username }}
+                        <fa-icon *ngIf="lobbyState.player.computerUserID === player.computerUserID"
+                            class="red icon-action" [icon]="faTimesCircle" (click)="disconnectPlayer()"></fa-icon>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="public col">
+        <div class="card">
+            <div class="card-header">
+                <span>Public Lobbies</span>
+                <fa-icon
+                    [ngClass]="{ 'green': !isPlayerInLobby && isPlayerRegistered, 'gray': ((isPlayerInLobby && isPlayerRegistered) || (!isPlayerInLobby && !isPlayerRegistered))}"
+                    [icon]="faPlus" (click)="openAddLobbyModal(addLobbyModalContent)" class="icon-action"></fa-icon>
+            </div>
+            <div class="card-body" [ngbCollapse]="isLobbyCollapsed || (gameInProgress && !manuallyOpenedLobby)">
+                <ul class="list-group list-group-flush lobbies">
+                    <li class="list-group-item card-text" *ngFor="let lobby of lobbyState.lobbies">
+                        <fa-icon class="gray icon-no-action" [icon]="faUsers"></fa-icon>
+                        {{ lobby.name }}
+                        <span class="icon-actions">
+                            <fa-icon class="icon-action"
+                                [ngClass]="{'green': !isPlayerInLobby && isPlayerRegistered, 'gray': isPlayerInLobby && isPlayerRegistered}"
+                                [icon]="faEye" (click)="spectateLobby(lobby.id)"></fa-icon>
+                            <fa-icon *ngIf="!isPlayerInLobby && isPlayerRegistered" class="icon-action"
+                                [ngClass]="lobby.open ? 'green' : 'gray'" [icon]="faSignInAlt"
+                                (click)="joinLobby(lobby.id, lobby.open)"></fa-icon>
+                            <fa-icon *ngIf="isPlayerInLobby && isPlayerRegistered" class="icon-action"
+                                [ngClass]="canLeaveLobby(lobby.id) ? 'red': 'gray'"
+                                [icon]="canLeaveLobby(lobby.id) ? faSignOutAlt: faSignInAlt"
+                                (click)="leaveLobby(lobby.id)"></fa-icon>
+                            <fa-icon class="icon-action start-game-btn"
+                                [ngClass]="canStartGame(lobby.id) ? 'green': 'gray'" [icon]="faPlay"
+                                (click)="startGame(lobby.id)"></fa-icon>
+                        </span>
+                        <ul class="lobby-players">
+                            <li class="card-text" *ngFor="let lp of lobby.players">
+                                <fa-icon class="icon-no-action"
+                                    [ngClass]="{'lobby-owner' : lobby.owner.computerUserID === lp.computerUserID, 'blue' : lobbyState.player.computerUserID === lp.computerUserID, 'gray': lobbyState.player.computerUserID !== lp.computerUserID}"
+                                    [icon]="lobby.owner.computerUserID === lp.computerUserID ? faUserCircle : lp.isSpectator ? faEye: faUser">
+                                </fa-icon>
+                                {{ lp.username }}
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #addPlayerModalContent>
+    <div class="modal-header">
+        <h4 class="modal-title">Player Name</h4>
+    </div>
+    <div class="modal-body">
+        <form id="playerNameForm" #playerNameForm="ngForm" (ngSubmit)="registerPlayer(playerNameForm.value.playerName)">
+            <input class="form-control form-control" type="text" id="playerName" name="playerName" ngModel>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" form="playerNameForm">Join</button>
+    </div>
+</ng-template>
+
+<ng-template #addLobbyModalContent>
+    <div class="modal-header">
+        <h4 class="modal-title">Lobby Name</h4>
+    </div>
+    <div class="modal-body">
+        <form id="lobbyNameForm" #lobbyNameForm="ngForm" (ngSubmit)="createLobby(lobbyNameForm.value)">
+            <div class="form-row">
+                <div class="col-9">
+                    <input class="form-control form-control" type="text" id="lobbyName" name="lobbyName" ngModel>
+                </div>
+                <div class="col-3">
+                    <div class="input-group">
+                        <div class="form-control">Public</div>
+                        <div class="input-group-append">
+                            <span class="input-group-text">
+                                <input type="checkbox" id="isPublic" name="isPublic" ngModel='true'>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" form="lobbyNameForm">Create</button>
+    </div>
+</ng-template>

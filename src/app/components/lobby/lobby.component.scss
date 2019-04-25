@@ -1,0 +1,75 @@
+.menu {
+  fa-icon {
+    float: left;
+    font-size: 3vmin;
+    transform: rotate(180deg);
+    :hover {
+      cursor: pointer;
+    }
+  }
+
+  .up {
+    transform: rotate(0deg);
+  }
+}
+
+.lobby {
+  margin: 1vmin 2vmin;
+
+  @media only screen and (max-height: 870px) {
+    margin: 0;
+  }
+
+  font-size: 1.5vmin;
+
+  .card {
+    height: 100%;
+  }
+
+  .green {
+    color: #28a745;
+    :hover {
+      cursor: pointer;
+    }
+  }
+
+  .red {
+    color: #dc3545;
+
+    :hover {
+      cursor: pointer;
+    }
+  }
+
+  .blue {
+    color: #007bff;
+  }
+
+  .gray {
+    color: #6c757d;
+    :hover {
+      cursor: default;
+    }
+  }
+
+  .icon-action {
+    float: right;
+    margin-left: 2vmin;
+  }
+
+  .icon-actions fa-icon:last-child {
+    margin-left: 0px;
+  }
+
+  .icon-no-action {
+    padding-right: 2vmin;
+    :hover {
+      cursor: default;
+    }
+  }
+
+  .lobby-players {
+    list-style-type: none;
+    padding-left: 2vmin;
+  }
+}

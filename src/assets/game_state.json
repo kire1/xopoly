@@ -1,0 +1,1421 @@
+{
+
+  "players": [
+
+    {
+
+      "id": "72a9f9dd-831e-4e1f-9e1d-71131ae6e185",
+
+      "name": "a",
+
+      "money": 1500,
+
+      "boardPosition": 0,
+
+      "prevBoardPosition": 0,
+
+      "wasDirectMovement": false,
+
+      "numDoublesRolledInARow": 0,
+
+      "currentDiceRoll": null,
+
+      "turnOrder": 1,
+
+      "isInJail": false,
+
+      "rollsWhileInJail": 0,
+
+      "color": "Red",
+
+      "hasGetOutOfJailFreeCard": false,
+
+      "currentTurnElapsedSeconds": 6
+
+    },
+
+    {
+
+      "id": "3b930089-33d0-4c58-8801-d58dfcbf6764",
+
+      "name": "b",
+
+      "money": 1500,
+
+      "boardPosition": 0,
+
+      "prevBoardPosition": 0,
+
+      "wasDirectMovement": false,
+
+      "numDoublesRolledInARow": 0,
+
+      "currentDiceRoll": null,
+
+      "turnOrder": 2,
+
+      "isInJail": false,
+
+      "rollsWhileInJail": 0,
+
+      "color": "Green",
+
+      "hasGetOutOfJailFreeCard": false,
+
+      "currentTurnElapsedSeconds": 0
+
+    },
+
+    {
+
+      "id": "5857a154-77d1-4c9d-b685-9f14e5b81488",
+
+      "name": "c",
+
+      "money": 1500,
+
+      "boardPosition": 0,
+
+      "prevBoardPosition": 0,
+
+      "wasDirectMovement": false,
+
+      "numDoublesRolledInARow": 0,
+
+      "currentDiceRoll": null,
+
+      "turnOrder": 3,
+
+      "isInJail": false,
+
+      "rollsWhileInJail": 0,
+
+      "color": "Blue",
+
+      "hasGetOutOfJailFreeCard": false,
+
+      "currentTurnElapsedSeconds": 0
+
+    },
+
+    {
+
+      "id": "b675843b-f9ea-467b-a808-98efb0d37278",
+
+      "name": "d",
+
+      "money": 1500,
+
+      "boardPosition": 0,
+
+      "prevBoardPosition": 0,
+
+      "wasDirectMovement": false,
+
+      "numDoublesRolledInARow": 0,
+
+      "currentDiceRoll": null,
+
+      "turnOrder": 4,
+
+      "isInJail": false,
+
+      "rollsWhileInJail": 0,
+
+      "color": "Yellow",
+
+      "hasGetOutOfJailFreeCard": false,
+
+      "currentTurnElapsedSeconds": 0
+
+    }
+
+  ],
+
+  "tiles": [
+
+    {
+
+      "name": "GO",
+
+      "type": "Go",
+
+      "id": 0
+
+    },
+
+    {
+
+      "color": "Brown",
+
+      "buildingCount": 0,
+
+      "rent": 2,
+
+      "rentAmountPerBuilding": [
+
+        2,
+
+        10,
+
+        30,
+
+        90,
+
+        160,
+
+        250
+
+      ],
+
+      "buildingCost": 50,
+
+      "type": "ColorProperty",
+
+      "cost": 60,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 30,
+
+      "redeemValue": 33,
+
+      "name": "Mediterranean Avenue",
+
+      "id": 1
+
+    },
+
+    {
+
+      "name": "Community Chest",
+
+      "type": "CommunityChest",
+
+      "id": 2
+
+    },
+
+    {
+
+      "color": "Brown",
+
+      "buildingCount": 0,
+
+      "rent": 4,
+
+      "rentAmountPerBuilding": [
+
+        4,
+
+        20,
+
+        60,
+
+        180,
+
+        320,
+
+        450
+
+      ],
+
+      "buildingCost": 50,
+
+      "type": "ColorProperty",
+
+      "cost": 60,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 30,
+
+      "redeemValue": 33,
+
+     "name": "Baltic Avenue",
+
+      "id": 3
+
+    },
+
+    {
+
+      "type": "Tax",
+
+      "cost": 200,
+
+      "name": "Income Tax",
+
+      "id": 4
+
+    },
+
+    {
+
+      "type": "Railroad",
+
+      "cost": 200,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 100,
+
+      "redeemValue": 110,
+
+      "name": "Reading Railroad",
+
+      "id": 5
+
+    },
+
+    {
+
+      "color": "LightBlue",
+
+      "buildingCount": 0,
+
+      "rent": 6,
+
+      "rentAmountPerBuilding": [
+
+        6,
+
+        30,
+
+        90,
+
+        270,
+
+        400,
+
+        550
+
+      ],
+
+      "buildingCost": 50,
+
+      "type": "ColorProperty",
+
+      "cost": 100,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 50,
+
+      "redeemValue": 55,
+
+      "name": "Oriental Avenue",
+
+      "id": 6
+
+    },
+
+    {
+
+      "name": "Chance",
+
+      "type": "Chance",
+
+      "id": 7
+
+    },
+
+    {
+
+      "color": "LightBlue",
+
+      "buildingCount": 0,
+
+      "rent": 6,
+
+      "rentAmountPerBuilding": [
+
+        6,
+
+        30,
+
+        90,
+
+        270,
+
+        400,
+
+        550
+
+      ],
+
+      "buildingCost": 50,
+
+      "type": "ColorProperty",
+
+      "cost": 100,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 50,
+
+      "redeemValue": 55,
+
+      "name": "Vermont Avenue",
+
+      "id": 8
+
+    },
+
+    {
+
+      "color": "LightBlue",
+
+      "buildingCount": 0,
+
+      "rent": 8,
+
+      "rentAmountPerBuilding": [
+
+        8,
+
+        40,
+
+        100,
+
+        300,
+
+        450,
+
+        600
+
+      ],
+
+      "buildingCost": 50,
+
+      "type": "ColorProperty",
+
+      "cost": 120,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 60,
+
+      "redeemValue": 66,
+
+      "name": "Connecticut Avenue",
+
+      "id": 9
+
+    },
+
+    {
+
+      "name": "Jail",
+
+      "type": "Jail",
+
+      "id": 10
+
+    },
+
+    {
+
+      "color": "Pink",
+
+      "buildingCount": 0,
+
+      "rent": 10,
+
+      "rentAmountPerBuilding": [
+
+        10,
+
+        50,
+
+        150,
+
+        450,
+
+        625,
+
+        750
+
+      ],
+
+      "buildingCost": 100,
+
+      "type": "ColorProperty",
+
+      "cost": 140,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 70,
+
+      "redeemValue": 77,
+
+      "name": "St. Charles Place",
+
+      "id": 11
+
+    },
+
+    {
+
+      "type": "Utilities",
+
+      "cost": 150,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 75,
+
+      "redeemValue": 82,
+
+      "name": "Electric Company",
+
+      "id": 12
+
+    },
+
+    {
+
+      "color": "Pink",
+
+      "buildingCount": 0,
+
+      "rent": 10,
+
+      "rentAmountPerBuilding": [
+
+        10,
+
+        50,
+
+        150,
+
+        450,
+
+        625,
+
+        750
+
+      ],
+
+      "buildingCost": 100,
+
+      "type": "ColorProperty",
+
+      "cost": 140,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 70,
+
+      "redeemValue": 77,
+
+      "name": "States Avenue",
+
+      "id": 13
+
+    },
+
+    {
+
+      "color": "Pink",
+
+      "buildingCount": 0,
+
+      "rent": 12,
+
+      "rentAmountPerBuilding": [
+
+        12,
+
+        60,
+
+        180,
+
+        500,
+
+        700,
+
+        900
+
+      ],
+
+      "buildingCost": 100,
+
+      "type": "ColorProperty",
+
+      "cost": 160,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 80,
+
+      "redeemValue": 88,
+
+      "name": "Virginia Avenue",
+
+      "id": 14
+
+    },
+
+    {
+
+      "type": "Railroad",
+
+      "cost": 200,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 100,
+
+      "redeemValue": 110,
+
+      "name": "Pennsylvania Railroad",
+
+      "id": 15
+
+    },
+
+    {
+
+      "color": "Orange",
+
+      "buildingCount": 0,
+
+      "rent": 14,
+
+      "rentAmountPerBuilding": [
+
+        14,
+
+        70,
+
+        200,
+
+        550,
+
+        750,
+
+        950
+
+      ],
+
+      "buildingCost": 100,
+
+      "type": "ColorProperty",
+
+      "cost": 180,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 90,
+
+      "redeemValue": 99,
+
+      "name": "St. James Place",
+
+      "id": 16
+
+    },
+
+    {
+
+      "name": "Community Chest",
+
+      "type": "CommunityChest",
+
+      "id": 17
+
+    },
+
+    {
+
+      "color": "Orange",
+
+      "buildingCount": 0,
+
+      "rent": 14,
+
+      "rentAmountPerBuilding": [
+
+        14,
+
+        70,
+
+        200,
+
+        550,
+
+        750,
+
+        950
+
+      ],
+
+      "buildingCost": 100,
+
+      "type": "ColorProperty",
+
+      "cost": 180,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 90,
+
+      "redeemValue": 99,
+
+      "name": "Tennessee Avenue",
+
+      "id": 18
+
+    },
+
+    {
+
+      "color": "Orange",
+
+      "buildingCount": 0,
+
+      "rent": 16,
+
+      "rentAmountPerBuilding": [
+
+        16,
+
+        80,
+
+        220,
+
+        600,
+
+        800,
+
+        1000
+
+      ],
+
+      "buildingCost": 100,
+
+      "type": "ColorProperty",
+
+      "cost": 200,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 100,
+
+      "redeemValue": 110,
+
+      "name": "New York Avenue",
+
+      "id": 19
+
+    },
+
+    {
+
+      "name": "Free Parking",
+
+      "type": "FreeParking",
+
+      "id": 20
+
+    },
+
+    {
+
+      "color": "Red",
+
+      "buildingCount": 0,
+
+      "rent": 18,
+
+      "rentAmountPerBuilding": [
+
+        18,
+
+        90,
+
+        250,
+
+        700,
+
+        875,
+
+        1050
+
+      ],
+
+      "buildingCost": 150,
+
+      "type": "ColorProperty",
+
+      "cost": 220,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 110,
+
+      "redeemValue": 121,
+
+      "name": "Kentucky Avenue",
+
+      "id": 21
+
+    },
+
+    {
+
+      "name": "Chance",
+
+      "type": "Chance",
+
+      "id": 22
+
+    },
+
+    {
+
+      "color": "Red",
+
+      "buildingCount": 0,
+
+      "rent": 18,
+
+      "rentAmountPerBuilding": [
+
+        18,
+
+        90,
+
+        250,
+
+        700,
+
+        875,
+
+        1050
+
+      ],
+
+      "buildingCost": 150,
+
+      "type": "ColorProperty",
+
+      "cost": 220,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 110,
+
+      "redeemValue": 121,
+
+      "name": "Indiana Avenue",
+
+      "id": 23
+
+    },
+
+    {
+
+      "color": "Red",
+
+      "buildingCount": 0,
+
+      "rent": 20,
+
+      "rentAmountPerBuilding": [
+
+        20,
+
+        100,
+
+        300,
+
+        750,
+
+        925,
+
+        1100
+
+      ],
+
+      "buildingCost": 150,
+
+      "type": "ColorProperty",
+
+      "cost": 240,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 120,
+
+      "redeemValue": 132,
+
+      "name": "Illinois Avenue",
+
+      "id": 24
+
+    },
+
+    {
+
+      "type": "Railroad",
+
+      "cost": 200,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 100,
+
+      "redeemValue": 110,
+
+      "name": "B. & O. Railroad",
+
+      "id": 25
+
+    },
+
+    {
+
+      "color": "Yellow",
+
+      "buildingCount": 0,
+
+      "rent": 22,
+
+      "rentAmountPerBuilding": [
+
+        22,
+
+        110,
+
+        330,
+
+        800,
+
+        975,
+
+        1150
+
+      ],
+
+      "buildingCost": 150,
+
+      "type": "ColorProperty",
+
+      "cost": 260,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 130,
+
+      "redeemValue": 143,
+
+      "name": "Atlantic Avenue",
+
+      "id": 26
+
+    },
+
+    {
+
+      "color": "Yellow",
+
+      "buildingCount": 0,
+
+      "rent": 22,
+
+      "rentAmountPerBuilding": [
+
+        22,
+
+        110,
+
+        330,
+
+        800,
+
+        975,
+
+        1150
+
+      ],
+
+      "buildingCost": 150,
+
+      "type": "ColorProperty",
+
+      "cost": 260,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 130,
+
+      "redeemValue": 143,
+
+      "name": "Ventnor Avenue",
+
+      "id": 27
+
+    },
+
+    {
+
+      "type": "Utilities",
+
+      "cost": 150,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 75,
+
+      "redeemValue": 82,
+
+      "name": "Water Works",
+
+      "id": 28
+
+    },
+
+    {
+
+      "color": "Yellow",
+
+      "buildingCount": 0,
+
+      "rent": 24,
+
+      "rentAmountPerBuilding": [
+
+        24,
+
+        120,
+
+        360,
+
+        850,
+
+        1025,
+
+        1200
+
+      ],
+
+      "buildingCost": 150,
+
+      "type": "ColorProperty",
+
+      "cost": 280,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 140,
+
+      "redeemValue": 154,
+
+      "name": "Marven Gardens",
+
+      "id": 29
+
+    },
+
+    {
+
+      "name": "Go To Jail",
+
+      "type": "GoToJail",
+
+      "id": 30
+
+    },
+
+    {
+
+      "color": "Green",
+
+      "buildingCount": 0,
+
+      "rent": 26,
+
+      "rentAmountPerBuilding": [
+
+        26,
+
+        130,
+
+        390,
+
+        900,
+
+        1100,
+
+        1275
+
+      ],
+
+      "buildingCost": 200,
+
+      "type": "ColorProperty",
+
+      "cost": 300,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 150,
+
+      "redeemValue": 165,
+
+      "name": "Pacific Avenue",
+
+      "id": 31
+
+    },
+
+    {
+
+      "color": "Green",
+
+      "buildingCount": 0,
+
+      "rent": 26,
+
+      "rentAmountPerBuilding": [
+
+        26,
+
+        130,
+
+        390,
+
+        900,
+
+        1100,
+
+        1275
+
+      ],
+
+      "buildingCost": 200,
+
+      "type": "ColorProperty",
+
+      "cost": 300,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 150,
+
+      "redeemValue": 165,
+
+      "name": "North Carolina Avenue",
+
+      "id": 32
+
+    },
+
+    {
+
+      "name": "Community Chest",
+
+      "type": "CommunityChest",
+
+      "id": 33
+
+    },
+
+    {
+
+      "color": "Green",
+
+      "buildingCount": 0,
+
+      "rent": 28,
+
+      "rentAmountPerBuilding": [
+
+        28,
+
+        150,
+
+        450,
+
+        1000,
+
+        1200,
+
+        1400
+
+      ],
+
+      "buildingCost": 200,
+
+      "type": "ColorProperty",
+
+      "cost": 320,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 160,
+
+      "redeemValue": 176,
+
+      "name": "Pennsylvania Avenue",
+
+      "id": 34
+
+    },
+
+    {
+
+      "type": "Railroad",
+
+      "cost": 200,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 100,
+
+      "redeemValue": 110,
+
+      "name": "Shortline",
+
+      "id": 35
+
+    },
+
+    {
+
+      "name": "Chance",
+
+      "type": "Chance",
+
+      "id": 36
+
+    },
+
+    {
+
+      "color": "DarkBlue",
+
+      "buildingCount": 0,
+
+      "rent": 35,
+
+      "rentAmountPerBuilding": [
+
+        35,
+
+        175,
+
+        500,
+
+        1100,
+
+        1300,
+
+        1500
+
+      ],
+
+      "buildingCost": 200,
+
+      "type": "ColorProperty",
+
+      "cost": 350,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 175,
+
+      "redeemValue": 193,
+
+      "name": "Park Place",
+
+      "id": 37
+
+    },
+
+    {
+
+      "type": "Tax",
+
+      "cost": 100,
+
+      "name": "Luxury Tax",
+
+      "id": 38
+
+    },
+
+    {
+
+      "color": "DarkBlue",
+
+      "buildingCount": 0,
+
+      "rent": 50,
+
+      "rentAmountPerBuilding": [
+
+        50,
+
+        200,
+
+        600,
+
+        1400,
+
+        1700,
+
+        2000
+
+      ],
+
+      "buildingCost": 200,
+
+      "type": "ColorProperty",
+
+      "cost": 400,
+
+      "ownerPlayerID": null,
+
+      "isMortgaged": false,
+
+      "mortgageValue": 200,
+
+      "redeemValue": 220,
+
+      "name": "Boardwalk",
+
+      "id": 39
+
+    }
+
+  ],
+
+  "turnTimeoutSeconds": 45,
+
+  "currentPlayerListIndex": 0,
+
+  "currentPlayer": {
+
+    "id": "72a9f9dd-831e-4e1f-9e1d-71131ae6e185",
+
+    "name": "a",
+
+    "money": 1500,
+
+    "boardPosition": 0,
+
+    "prevBoardPosition": 0,
+
+    "wasDirectMovement": false,
+
+    "numDoublesRolledInARow": 0,
+
+    "currentDiceRoll": null,
+
+    "turnOrder": 1,
+
+    "isInJail": false,
+
+    "rollsWhileInJail": 0,
+
+    "color": "Red",
+
+    "hasGetOutOfJailFreeCard": false,
+
+    "currentTurnElapsedSeconds": 6
+
+  },
+
+  "currentFrameId": 0,
+
+  "waitForBuyOrAuctionStart": false,
+
+  "currentTile": {
+
+    "name": "GO",
+
+    "type": "Go",
+
+    "id": 0
+
+  },
+
+  "auctionInProgress": false,
+
+  "auction": null,
+
+  "tradeOffers": [],
+
+  "communityChestDeck": {
+
+    "currentPlayerCardText": null
+
+  },
+
+  "chanceDeck": {
+
+    "currentPlayerCardText": null
+
+  },
+
+  "gameFinished": false
+
+}

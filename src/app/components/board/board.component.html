@@ -1,0 +1,265 @@
+<div class="game-board">
+	<div *ngIf="gameState" class="game-ui">
+		<div class="board">
+			<div class="center">
+				<interactions [gamePlayerId]="gamePlayerId"
+					(startMortgagePropertySelection)="startMortgageViewPropertySelection($event)"
+					(startRedeemPropertySelection)="startRedeemViewPropertySelection($event)"
+					(startBuildPropertySelection)="startBuildViewPropertySelection($event)"
+					(startSellPropertySelection)="startSellViewPropertySelection($event)">
+				</interactions>
+			</div>
+
+			<div class="space corner go" id="0" [ngClass]="getTileClasses(0)">
+				<div class="container">
+					<span *ngFor="let player of gameState.players; let i = index" [ngClass]="0 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					<div class="instructions">Collect $200.00 salary as you pass</div>
+					<div class="go-word">go</div>
+					<fa-icon class="drawing arrow-drawing" [icon]="faLongArrowAltLeft"></fa-icon>
+				</div>
+			</div>
+
+			<div class="row horizontal-row bottom-row">
+				<div class="space" *ngFor="let tile of gameState.tiles.slice(1,10).reverse()" id="{{tile.id}}"
+					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
+					<div class="container">
+						<fa-icon *ngIf="tile.isMortgaged"
+							[ngClass]="tile.type === 'Railroad' ? 'mortgaged-ban-symbol-railroad' : 'mortgaged-ban-symbol'"
+							[icon]="faCreativeCommonsNc"></fa-icon>
+						<div class="color-bar" [ngClass]="tile.color">
+							<div *ngIf="tile.buildingCount && 5 > tile.buildingCount" class="house-container">
+								<fa-icon class="drawing" [icon]="faHome"
+									*ngFor="let building of getBuildingCountArray(tile.buildingCount)">
+								</fa-icon>
+							</div>
+							<div *ngIf="tile.buildingCount && tile.buildingCount >= 5" class="hotel-container">
+								<fa-icon class="drawing" [icon]="faHotel"></fa-icon>
+							</div>
+						</div>
+						<div class="info">
+							<span *ngFor="let player of gameState.players; let i = index"
+								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<div class="name">{{ tile.name }}</div>
+							<fa-icon *ngIf="tile.type == 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
+							<fa-icon *ngIf="tile.type == 'Railroad'" class="drawing railroad-drawing" [icon]="faSubway">
+							</fa-icon>
+							<fa-icon *ngIf="tile.type == 'CommunityChest'" class="drawing community-chest-drawing"
+								[icon]="faCube"></fa-icon>
+							<div class="price">{{ tile.cost | currency : 'USD' : 'symbol' : '1.0' }}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="space corner jail" id="10" [ngClass]="getTileClasses(10)">
+				<div class="just">Just</div>
+				<div class="drawing">
+					<div class="container">
+						<div class="name">In</div>
+						<div class="window">
+							<div class="bar"></div>
+							<div class="bar"></div>
+							<div class="bar"></div>
+							<i class="person fa fa-frown-o"></i>
+						</div>
+						<div class="name">Jail</div>
+						<span *ngFor="let player of gameState.players; let i = index"
+							[ngClass]="10 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					</div>
+				</div>
+				<div class="visiting">Visiting</div>
+			</div>
+
+			<div class="row vertical-row left-row">
+				<div class="space" *ngFor="let tile of gameState.tiles.slice(11,20).reverse()" id="{{tile.id}}"
+					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
+					<div class="container">
+						<fa-icon *ngIf="tile.isMortgaged"
+							[ngClass]="tile.type === 'Railroad' ? 'mortgaged-ban-symbol-railroad' : 'mortgaged-ban-symbol'"
+							[icon]="faCreativeCommonsNc"></fa-icon>
+						<div class="color-bar" [ngClass]="tile.color">
+							<div *ngIf="tile.buildingCount && 5 > tile.buildingCount" class="house-container">
+								<fa-icon class="drawing" [icon]="faHome"
+									*ngFor="let building of getBuildingCountArray(tile.buildingCount)">
+								</fa-icon>
+							</div>
+							<div *ngIf="tile.buildingCount && tile.buildingCount >= 5" class="hotel-container">
+								<fa-icon class="drawing" [icon]="faHotel"></fa-icon>
+							</div>
+						</div>
+						<div class="info">
+							<span *ngFor="let player of gameState.players; let i = index"
+								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<div class="name">{{ tile.name }}</div>
+							<fa-icon *ngIf="tile.type == 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
+							<fa-icon *ngIf="tile.type == 'Railroad'" class="drawing railroad-drawing" [icon]="faSubway">
+							</fa-icon>
+							<fa-icon *ngIf="tile.type == 'CommunityChest'" class="drawing community-chest-drawing"
+								[icon]="faCube"></fa-icon>
+							<fa-icon *ngIf="tile.id === 12" class="drawing electric-company-drawing"
+								[icon]="faLightbulb"></fa-icon>
+							<div class="price">{{ tile.cost | currency : 'USD' : 'symbol' : '1.0' }}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="space corner free-parking" id="20" [ngClass]="getTileClasses(20)">
+				<div class="container">
+					<span *ngFor="let player of gameState.players; let i = index"
+						[ngClass]="20 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					<div class="name">Free</div>
+					<fa-icon class="drawing" [icon]="faCar"></fa-icon>
+					<div class="name">Parking</div>
+				</div>
+			</div>
+
+			<div class="row horizontal-row top-row">
+				<div class="space" *ngFor="let tile of gameState.tiles.slice(21,30)" id="{{tile.id}}"
+					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
+					<div class="container">
+						<fa-icon *ngIf="tile.isMortgaged"
+							[ngClass]="tile.type === 'Railroad' ? 'mortgaged-ban-symbol-railroad' : 'mortgaged-ban-symbol'"
+							[icon]="faCreativeCommonsNc"></fa-icon>
+						<div class="color-bar" [ngClass]="tile.color">
+							<div *ngIf="tile.buildingCount && 5 > tile.buildingCount" class="house-container">
+								<fa-icon class="drawing" [icon]="faHome"
+									*ngFor="let building of getBuildingCountArray(tile.buildingCount)">
+								</fa-icon>
+							</div>
+							<div *ngIf="tile.buildingCount && tile.buildingCount >= 5" class="hotel-container">
+								<fa-icon class="drawing" [icon]="faHotel"></fa-icon>
+							</div>
+						</div>
+						<div class="info">
+							<span *ngFor="let player of gameState.players; let i = index"
+								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<div class="name">{{ tile.name }}</div>
+							<fa-icon *ngIf="tile.type == 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
+							<fa-icon *ngIf="tile.type == 'Railroad'" class="drawing railroad-drawing" [icon]="faSubway">
+							</fa-icon>
+							<fa-icon *ngIf="tile.type == 'CommunityChest'" class="drawing community-chest-drawing"
+								[icon]="faCube"></fa-icon>
+							<fa-icon *ngIf="tile.id === 28" class="drawing water-works-drawing" [icon]="faTint">
+							</fa-icon>
+							<div class="price">{{ tile.cost | currency : 'USD' : 'symbol' : '1.0' }}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="space corner go-to-jail" id="30" [ngClass]="getTileClasses(30)">
+				<div class="container">
+					<span *ngFor="let player of gameState.players; let i = index"
+						[ngClass]="30 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					<div class="name">Go To</div>
+					<fa-icon class="drawing" [icon]="faGavel"></fa-icon>
+					<div class="name">Jail</div>
+				</div>
+			</div>
+
+			<div class="row vertical-row right-row">
+				<div class="space" *ngFor="let tile of gameState.tiles.slice(31,40)" id="{{tile.id}}"
+					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
+					<div class="container">
+						<fa-icon *ngIf="tile.isMortgaged" class="drawing"
+							[ngClass]="tile.type === 'Railroad' ? 'mortgaged-ban-symbol-railroad' : 'mortgaged-ban-symbol'"
+							[icon]="faCreativeCommonsNc"></fa-icon>
+						<div class="color-bar" [ngClass]="tile.color">
+							<div *ngIf="tile.buildingCount && 5 > tile.buildingCount" class="house-container">
+								<fa-icon class="drawing" [icon]="faHome"
+									*ngFor="let building of getBuildingCountArray(tile.buildingCount)">
+								</fa-icon>
+							</div>
+							<div *ngIf="tile.buildingCount && tile.buildingCount >= 5" class="hotel-container">
+								<fa-icon class="drawing" [icon]="faHotel"></fa-icon>
+							</div>
+						</div>
+						<div class="info">
+							<span *ngFor="let player of gameState.players; let i = index"
+								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<div class="name">{{ tile.name }}</div>
+							<fa-icon *ngIf="tile.type === 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
+							<fa-icon *ngIf="tile.type === 'Railroad'" class="drawing railroad-drawing"
+								[icon]="faSubway"></fa-icon>
+							<fa-icon *ngIf="tile.type === 'CommunityChest'" class="drawing community-chest-drawing"
+								[icon]="faCube"></fa-icon>
+							<div class="price">{{ tile.cost | currency : 'USD' : 'symbol' : '1.0' }}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<ng-template #propertyViewModalContent>
+	<div class="property-card-view">
+		<div class="modal-header"
+			[ngClass]="'Border-Bottom-' + (propertyForPropertyViewModal.color ? propertyForPropertyViewModal.color : propertyForPropertyViewModal.type)">
+			<h4 class="modal-title">TITLE DEED</h4>
+			<button type="button" class="close" (click)="closePropertyViewModal()">
+				<span>&times;</span>
+			</button>
+		</div>
+		<div class="modal-body">
+			<div class="property-card">
+				<div class="details">
+					<div class="card text-center" [ngClass]="'Tile-Border-' + (propertyForPropertyViewModal.color ? propertyForPropertyViewModal.color : propertyForPropertyViewModal.type)">
+						<div class="card-header" [ngClass]="'Tile-' + (propertyForPropertyViewModal.color ? propertyForPropertyViewModal.color : propertyForPropertyViewModal.type)">
+							<span class="card-title">{{propertyForPropertyViewModal.name}}</span>
+						</div>
+						<div class="card-body">
+							<p *ngIf="propertyForPropertyViewModal.type === 'ColorProperty'" class="rent">Rent:
+								{{propertyForPropertyViewModal.rent | currency : 'USD' : 'symbol' : '1.0'}}</p>
+							<p *ngIf="propertyForPropertyViewModal.type !== 'ColorProperty'" class="rent">Rent</p>
+							<div *ngIf="propertyForPropertyViewModal.type === 'ColorProperty'" class="rents">
+								<p>With 1 House:
+									{{propertyForPropertyViewModal.rentAmountPerBuilding[1] | currency : 'USD' : 'symbol' : '1.0'}}
+								</p>
+								<p>With 2 Houses:
+									{{propertyForPropertyViewModal.rentAmountPerBuilding[2] | currency : 'USD' : 'symbol' : '1.0'}}
+								</p>
+								<p>With 3 Houses:
+									{{propertyForPropertyViewModal.rentAmountPerBuilding[3] | currency : 'USD' : 'symbol' : '1.0'}}
+								</p>
+								<p>With 4 Houses:
+									{{propertyForPropertyViewModal.rentAmountPerBuilding[4] | currency : 'USD' : 'symbol' : '1.0'}}
+								</p>
+								<p>With HOTEL:
+									{{propertyForPropertyViewModal.rentAmountPerBuilding[5] | currency : 'USD' : 'symbol' : '1.0'}}
+								</p>
+							</div>
+							<div *ngIf="propertyForPropertyViewModal.type === 'Railroad'" class="rents">
+								<p>1 Railroad: $25</p>
+								<p>2 Railroads: $50</p>
+								<p>3 Railroads: $100</p>
+								<p>4 Railroads: $200</p>
+							</div>
+							<div *ngIf="propertyForPropertyViewModal.type === 'Utilities'" class="rents">
+								<p>1 Utility: $7 x Roll</p>
+								<p>2 Utilities: $14 x Roll</p>
+							</div>
+							<div class="info">
+								<p>Mortgage Value:
+									{{propertyForPropertyViewModal.mortgageValue | currency : 'USD' : 'symbol' : '1.0'}}
+								</p>
+								<p>Redeem Value:
+									{{propertyForPropertyViewModal.redeemValue | currency : 'USD' : 'symbol' : '1.0'}}
+								</p>
+							</div>
+							<div class="info">
+								<p *ngIf="propertyForPropertyViewModal.type === 'ColorProperty'">Houses Cost:
+									{{propertyForPropertyViewModal.buildingCost | currency : 'USD' : 'symbol' : '1.0'}}
+									each</p>
+								<p *ngIf="propertyForPropertyViewModal.type === 'ColorProperty'">Hotels Cost:
+									{{propertyForPropertyViewModal.buildingCost | currency : 'USD' : 'symbol' : '1.0'}}
+									each</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</ng-template>

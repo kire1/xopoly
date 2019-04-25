@@ -1,0 +1,4 @@
+Things to do:
+
+ISSUES:
+2. trade modal - own players and targer players monopolies with houses are listed as props to trade. can only trade with no houses built on any mono prop. 

@@ -1,0 +1,428 @@
+$board: #cde6d0;
+$black: #000;
+$purple: #5e3577;
+$brown: #7b3920;
+$light-blue: #73d3ff;
+$pink: #e91e63;
+$orange: #fa811d;
+$red: #f50c2b;
+$yellow: #ffed20;
+$green: #41994e;
+$dark-blue: #2265ef;
+$royal-blue: #008ac9;
+$dark-yellow: rgb(233, 197, 17);
+
+$player-red: #f5a9b6;
+$player-green: #7ae47a;
+$player-blue: #7090d4;
+$player-yellow: #f4eb69;
+$player-cyan: #54d8d8;
+$player-magenta: #ff8fff;
+
+@media only screen and (min-width: 940px) {
+  ngb-modal-window .modal-dialog {
+      max-width: 650px;
+  }
+}
+
+.property-card-view {
+  font-size: 1.7vmin;
+
+  .Border-Bottom-Brown {
+    border-bottom: 1px solid $brown;
+  }
+
+  .Border-Bottom-LightBlue {
+    border-bottom: 1px solid $light-blue;
+  }
+
+  .Border-Bottom-Pink {
+    border-bottom: 1px solid $pink;
+  }
+
+  .Border-Bottom-Orange {
+    border-bottom: 1px solid $orange;
+  }
+
+  .Border-Bottom-Red {
+    border-bottom: 1px solid $red;
+  }
+
+  .Border-Bottom-Yellow {
+    border-bottom: 1px solid $yellow;
+  }
+
+  .Border-Bottom-Green {
+    border-bottom: 1px solid $green;
+  }
+
+  .Border-Bottom-DarkBlue {
+    border-bottom: 1px solid $dark-blue;
+  }
+
+  .Border-Bottom-Railroad {
+    border-bottom: 1px solid $black;
+  }
+
+  .property-card {
+    .btns {
+      .btn {
+        font-size: 1.8vmin;
+      }
+
+      > .disabled {
+        background-color: gray;
+        border-color: gray;
+        color: whitesmoke;
+      }
+
+      > .disabled:focus {
+        box-shadow: none;
+      }
+
+      .price,
+      .wallet {
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.8vmin;
+      }
+
+      .bet {
+        margin-top: 0.7rem;
+      }
+
+      .green-money {
+        color: green;
+      }
+
+      .red-money {
+        color: red;
+      }
+    }
+
+    .details {
+      .rents,
+      .info {
+        line-height: 1vmin;
+      }
+
+      .info {
+        margin-top: 2.5vmin;
+      }
+
+      .card-header {
+        font-size: 2vmin;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .card {
+        min-height: 35vmin;
+        max-width: 35vmin;
+        margin: auto;
+      }
+
+      .Tile-Border-Brown {
+        border: 1px solid $brown;
+      }
+
+      .Tile-Border-LightBlue {
+        border: 1.5px solid $light-blue;
+      }
+
+      .Tile-Border-Pink {
+        border: 1.5px solid $pink;
+      }
+
+      .Tile-Border-Orange {
+        border: 1.5px solid $orange;
+      }
+
+      .Tile-Border-Red {
+        border: 1.5px solid $red;
+      }
+
+      .Tile-Border-Yellow {
+        border: 1.5px solid $yellow;
+      }
+
+      .Tile-Border-Green {
+        border: 1.5px solid $green;
+      }
+
+      .Tile-Border-DarkBlue {
+        border: 1.5px solid $dark-blue;
+      }
+
+      .Tile-Border-Railroad {
+        border: 1.5px solid $black;
+      }
+    }
+  }
+}
+
+.trade {
+  font-size: 1.7vmin;
+
+  .col {
+    height: 100%;
+    .row {
+      width: 100%;
+    }
+  }
+
+  .trade-props-money {
+    .money::before {
+      content: "$";
+      padding: 0 5px;
+      text-align: center;
+    }
+
+    .offer {
+      height: 100%;
+    }
+
+    .props {
+      .prop-name {
+        padding: 5px 10px;
+        width: 100%;
+        border-radius: 0.15rem;
+
+        span {
+          font-weight: 600;
+          margin-bottom: 0;
+        }
+
+        .prop-check-box {
+          height: 3vmin;
+          width: 2vmin;
+        }
+
+        .prop-check-box:hover {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .you {
+    .prop-name {
+      span {
+        margin-right: 10px;
+      }
+
+      input {
+        float: right;
+      }
+    }
+
+    .player-name-btn:focus {
+      box-shadow: none;
+    }
+
+    .player-name-btn:hover {
+      color: #007bff;
+      background-color: transparent;
+      background-image: none;
+      border-color: #007bff;
+      cursor: default;
+    }
+  }
+
+  .them {
+    .prop-name {
+      span {
+        margin-left: 10px;
+      }
+
+      input {
+        float: left;
+      }
+    }
+
+    .dropdown-menu {
+      .Player-Red:hover {
+        background-color: $player-red;
+      }
+
+      .Player-Green:hover {
+        background-color: $player-green;
+      }
+
+      .Player-Blue:hover {
+        background-color: $player-blue;
+      }
+
+      .Player-Yellow:hover {
+        background-color: $player-yellow;
+      }
+
+      .Player-Cyan:hover {
+        background-color: $player-cyan;
+      }
+
+      .Player-Magenta:hover {
+        background-color: $player-magenta;
+      }
+    }
+
+    .player-name-btn:hover {
+      color: #007bff;
+      background-color: transparent;
+      background-image: none;
+      border-color: #007bff;
+      cursor: default;
+    }
+  }
+
+  .them .props .prop-name input {
+    float: left;
+  }
+
+  .trade-title {
+    margin-bottom: 1vmin;
+  }
+  .trade-props {
+    margin-bottom: 1vmin;
+  }
+  .trade-money {
+    margin-bottom: 0px;
+  }
+}
+
+.view-offer {
+  .offers {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+
+    .offer {
+      margin-bottom: 2vmin;
+    }
+  }
+
+  .card {
+    width: 14rem;
+    height: 100%;
+
+    .card-header {
+      font-weight: 600;
+      padding: 0.5rem 0.75rem;
+    }
+
+    .card-body {
+      padding: 0.5rem;
+
+      .card-title {
+        font-weight: 600;
+        margin-bottom: 0;
+        font-size: 1.1rem;
+        border-bottom: 1px solid lightgray;
+        border-top-left-radius: 0.3rem;
+        border-top-right-radius: 0.3rem;
+      }
+
+      .props {
+        margin: 0.5rem;
+
+        .prop-name {
+          font-weight: 600;
+          padding: 0.1rem;
+          margin: 0.3rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          border-radius: 0.15rem;
+        }
+      }
+    }
+
+    .card-footer {
+      button:first-child {
+        margin-right: 2vmin;
+      }
+
+      > .disabled {
+        background-color: gray;
+        border-color: gray;
+        color: whitesmoke;
+      }
+
+      > .disabled:focus {
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+.Player-Border-Red {
+  border: 2px solid $player-red;
+}
+
+.Player-Border-Green {
+  border: 2px solid $player-green;
+}
+
+.Player-Border-Blue {
+  border: 2px solid $player-blue;
+}
+
+.Player-Border-Yellow {
+  border: 2px solid $player-yellow;
+}
+
+.Player-Border-Cyan {
+  border: 2px solid $player-cyan;
+}
+
+.Player-Border-Magenta {
+  border: 2px solid $player-magenta;
+}
+
+.Tile-Brown {
+  background-color: $brown;
+  color: whitesmoke;
+}
+
+.Tile-LightBlue {
+  background-color: $light-blue;
+  color: whitesmoke;
+}
+
+.Tile-Pink {
+  background-color: $pink;
+  color: whitesmoke;
+}
+
+.Tile-Orange {
+  background-color: $orange;
+  color: whitesmoke;
+}
+
+.Tile-Red {
+  background-color: $red;
+  color: whitesmoke;
+}
+
+.Tile-Yellow {
+  background-color: $yellow;
+  color: black;
+}
+
+.Tile-Green {
+  background-color: $green;
+  color: whitesmoke;
+}
+
+.Tile-Railroad {
+  background-color: $black;
+  color: whitesmoke;
+}
+
+.Tile-Utility {
+  background-color: lightgray;
+  color: black;
+}
+
+.Tile-DarkBlue {
+  background-color: $dark-blue;
+  color: whitesmoke;
+}

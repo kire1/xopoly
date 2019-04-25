@@ -1,0 +1,860 @@
+@import "../../../styles";
+
+.game-ui {
+  $body-font: "Oswald", sans-serif;
+  font-family: $body-font;
+  $transparent: rgba(0, 0, 0, 0);
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+
+  $width_size: 90vmin / (9 + 2 * 1.58); //7.6vmin;
+  $height_size: $width_size * 1.58;
+  $drawing-size: 5vmin;
+
+  // =================
+  // GLOBAL
+  // =================
+
+  * {
+    box-sizing: border-box;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 0;
+  }
+
+  .Brown {
+    background-color: $brown;
+    color: #000;
+  }
+
+  .LightBlue {
+    background-color: $light-blue;
+    color: #000;
+  }
+
+  .Pink {
+    background-color: $pink;
+    color: #000;
+  }
+
+  .Orange {
+    background-color: $orange;
+    color: #000;
+  }
+
+  .Red {
+    background-color: $red;
+    color: #000;
+  }
+
+  .Yellow {
+    background-color: $yellow;
+    color: #000;
+  }
+
+  .Green {
+    background-color: $green;
+    color: #000;
+  }
+
+  .DarkBlue {
+    background-color: $dark-blue;
+    color: #000;
+  }
+
+  // =================
+  // LAYOUT
+  // =================
+
+  // Table and board
+
+  .table {
+    padding-left: 50px;
+    padding-right: 50px;
+  }
+
+  .board {
+    display: inline-grid;
+    grid-template-columns: $height_size repeat(9, $width_size) $height_size;
+    grid-template-rows: $height_size repeat(9, $width_size) $height_size;
+    grid-gap: 2px;
+    background: $black;
+    border: 2px solid $black;
+    vertical-align: top;
+  }
+
+  .center {
+    grid-area: 2 / 2 / 11 / 11;
+    background: $board;
+    color: #eee;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+  }
+
+  // Rows of spaces
+
+  .row {
+    display: grid;
+    grid-gap: 2px;
+  }
+
+  .horizontal-row {
+    grid-template-columns: repeat(9, $width_size);
+    grid-template-rows: $height_size;
+  }
+
+  .vertical-row {
+    grid-template-columns: $height_size;
+    grid-template-rows: repeat(9, $width_size);
+
+    .container {
+      top: 50%;
+      left: 50%;
+    }
+  }
+
+  .bottom-row {
+    grid-column: 2 / 11;
+    grid-row: 11;
+  }
+
+  .left-row {
+    grid-column: 1;
+    grid-row: 2 / 11;
+
+    .container {
+      transform: translate(-50%, -50%) rotate(90deg);
+    }
+  }
+
+  .top-row {
+    grid-column: 2 / 11;
+    grid-row: 1;
+  }
+
+  .right-row {
+    grid-column: 11;
+    grid-row: 2 / 11;
+
+    .container {
+      transform: translate(-50.5%, -50%) rotate(270deg);
+    }
+  }
+
+  // =================
+  // SPACES
+  // =================
+
+  // Types of spaces
+
+  .space {
+    text-transform: uppercase;
+    background: $board;
+    text-align: center;
+    color: $black;
+    overflow: hidden;
+    display: inline-block;
+
+    .water-works-drawing {
+      width: 3vmin;
+      color: $light-blue;
+      margin-top: calc(10% + 0.1vw);
+    }
+
+    .electric-company-drawing {
+      width: 2.6vmin;
+      color: $yellow;
+      margin-top: calc(1% + 0.1vw);
+    }
+
+    .container {
+      font-size: 1.15vmin;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      height: $height_size;
+      width: $width_size;
+      word-break: break-word;
+
+      .mortgaged-ban-symbol {
+        -webkit-text-stroke: 0.2vmin #000000;
+        color: #b10000;
+        position: absolute;
+        top: 2.8vmin;
+        left: 1vmin;
+        width: 75%;
+        margin-top: 0;
+        z-index: 1;
+      }
+
+      .mortgaged-ban-symbol-railroad {
+        -webkit-text-stroke: 0.2vmin #000000;
+        color: #b10000;
+        position: absolute;
+        top: 2.8vmin;
+        left: 0.9vmin;
+        width: 75%;
+        margin-top: 0;
+        z-index: 1;
+      }
+    }
+
+    .strikethrough-text {
+      text-decoration: line-through;
+    }
+
+    .price {
+      font-size: 2vmin;
+      font-weight: bold;
+      position: absolute;
+      bottom: 3%;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+
+    .info {
+      flex: 1;
+      position: relative;
+      padding: 15% 3% 5% 3%;
+      text-align: center;
+    }
+  }
+
+  .corner {
+    .container {
+      justify-content: space-around;
+      height: 100%;
+      width: 100%;
+    }
+
+    .name {
+      padding: 0;
+    }
+  }
+
+  .property {
+    .color-bar {
+      height: 20%;
+      position: relative;
+      width: 100%;
+      border-bottom: 2px solid $black;
+    }
+
+    .name {
+      padding-bottom: 20px;
+    }
+  }
+
+  .railroad {
+    .drawing {
+      font-size: $drawing-size * 0.9;
+      color: $black;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: calc(50% + 0.5vw);
+    }
+    .railroad-drawing {
+      margin-top: calc(50% + 1vw);
+      width: 3.5vmin;
+
+      @media only screen and (min-width: 800px) {
+        margin-top: calc(50% + 0.7vw);
+      }
+
+      @media only screen and (min-width: 1500px) {
+        margin-top: calc(50% + 0.5vw);
+      }
+    }
+  }
+
+  .utility {
+    .name {
+      padding-top: 10px;
+    }
+
+    .drawing {
+      font-size: $drawing-size;
+    }
+  }
+
+  .fee {
+    .name {
+      padding-top: 10px;
+      font-size: 2vmin;
+    }
+  }
+
+  // Specific spaces
+
+  .go {
+    grid-column: 11;
+    grid-row: 11 / 12;
+    position: relative;
+
+    .container {
+      justify-content: flex-start;
+      transform: rotate(315deg);
+    }
+
+    .instructions {
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      width: 100%;
+      padding: 15% 5% 5% 5%;
+    }
+
+    .go-word {
+      font-size: $drawing-size;
+      color: $red;
+      display: inline;
+      text-align: center;
+      font-weight: bold;
+      font-size: 4vmin;
+    }
+
+    .arrow-drawing {
+      font-size: $drawing-size;
+      color: $red;
+      position: absolute;
+      bottom: 15px;
+      left: -11px;
+      transform: rotate(45deg);
+    }
+  }
+
+  .jail {
+    grid-column: 1;
+    grid-row: 11 / 12;
+    display: grid;
+    grid-template-columns: repeat(10, $height_size/10);
+    grid-template-rows: repeat(10, $height_size/10);
+    justify-content: center;
+    align-items: center;
+
+    .drawing {
+      grid-column: 4 / 11;
+      grid-row: 1 / 8;
+      width: $height_size * 0.7;
+      height: $height_size * 0.7;
+      background: $orange;
+      border-bottom: 2px solid $black;
+      border-left: 2px solid $black;
+    }
+
+    .just {
+      grid-column: 3;
+      grid-row: 4;
+      transform: rotate(90deg);
+      padding-top: 5px;
+      font-size: 1.4vmin;
+    }
+
+    .visiting {
+      grid-column: 6;
+      grid-row: 8;
+      padding-top: 5px;
+      font-size: 1.6vmin;
+    }
+
+    .container {
+      align-items: center;
+      transform: rotate(45deg);
+    }
+
+    .name {
+      font-size: 1.6vmin;
+    }
+
+    .window {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: relative;
+      width: 50%;
+      height: 50%;
+      background: $board;
+      border: 2px solid $black;
+    }
+
+    .bar {
+      height: 100%;
+      width: 8%;
+      background: $black;
+    }
+  }
+
+  .free-parking {
+    grid-column: 1;
+    grid-row: 1 / 2;
+
+    .container {
+      justify-content: center;
+      transform: rotate(135deg);
+    }
+
+    .name {
+      font-size: 1.6vmin;
+    }
+
+    .drawing {
+      font-size: $drawing-size;
+      color: $red;
+      width: 6vmin;
+      margin-left: calc(25% + 0.1vw);
+    }
+  }
+
+  .go-to-jail {
+    grid-column: 11;
+    grid-row: 1 / 1;
+
+    .container {
+      justify-content: center;
+      transform: rotate(225deg);
+    }
+
+    .name {
+      font-size: 1.6vmin;
+    }
+
+    .drawing {
+      font-size: $drawing-size;
+      color: $brown;
+      transform: rotate(315deg);
+      width: 6vmin;
+      margin-left: calc(25% + 0.1vw);
+    }
+  }
+
+  .chance {
+    .container {
+      justify-content: center;
+    }
+
+    .drawing {
+      font-size: $drawing-size;
+      color: $red;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: calc(50% + 0.5vw);
+    }
+
+    .blue {
+      color: $dark-blue;
+    }
+  }
+
+  .community-chest {
+    .container {
+      justify-content: space-around;
+    }
+
+    .drawing {
+      font-size: $drawing-size;
+      color: $royal-blue;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: calc(50% + 0.5vw);
+    }
+
+    .community-chest-drawing {
+      margin-top: calc(50% + 2vw);
+      @media only screen and (min-width: 800px) {
+        margin-top: calc(50% + 0.9vw);
+      }
+      width: 5vmin;
+    }
+
+    .instructions {
+      font-size: 8px;
+    }
+  }
+
+  .electric-company {
+    .drawing {
+      color: $dark-yellow;
+    }
+  }
+
+  .waterworks {
+    .drawing {
+      color: $dark-blue;
+    }
+  }
+
+  .income-tax {
+    .container {
+      justify-content: center;
+      align-items: center;
+    }
+
+    .name {
+      padding-bottom: 5px;
+    }
+
+    .diamond {
+      width: 5px;
+      height: 5px;
+      background: $black;
+      transform: rotate(45deg);
+      display: inline-block;
+    }
+
+    .instructions {
+      padding-top: 5px;
+      padding-bottom: 5px;
+      font-size: 20px;
+    }
+  }
+
+  .luxury-tax {
+    .drawing {
+      font-size: $drawing-size;
+    }
+
+    .instructions {
+      padding-bottom: 5px;
+      font-size: 20px;
+    }
+  }
+
+  // =================
+  // UTILITY
+  // =================
+
+  .game-piece {
+    width: 3vmin;
+    height: 3vmin;
+    top: 30%;
+    position: absolute;
+    filter: brightness(1.1);
+    z-index: 1000;
+    border-radius: 50%;
+    border: 2px solid black;
+  }
+
+  .player-0 {
+    right: 10%;
+  }
+
+  .player-1 {
+    right: 20%;
+  }
+
+  .player-2 {
+    right: 30%;
+  }
+
+  .player-3 {
+    right: 40%;
+  }
+
+  .player-4 {
+    right: 50%;
+  }
+
+  .player-5 {
+    right: 60%;
+  }
+
+  .long-name {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .three-line-name {
+    position: relative;
+    top: 10px;
+  }
+
+  .Player-Background-Red {
+    background-color: $player-red;
+  }
+
+  .Player-Background-Green {
+    background-color: $player-green;
+  }
+
+  .Player-Background-Blue {
+    background-color: $player-blue;
+  }
+
+  .Player-Background-Yellow {
+    background-color: $player-yellow;
+  }
+
+  .Player-Background-Cyan {
+    background-color: $player-cyan;
+  }
+
+  .Player-Background-Magenta {
+    background-color: $player-magenta;
+  }
+
+  .Player-Text-Red {
+    color: $player-red;
+  }
+
+  .Player-Text-Green {
+    color: $player-green;
+  }
+
+  .Player-Text-Blue {
+    color: $player-blue;
+  }
+
+  .Player-Text-Yellow {
+    color: player-yellow;
+  }
+
+  .Player-Text-Cyan {
+    color: $player-cyan;
+  }
+
+  .Player-Text-Magenta {
+    color: $player-magenta;
+  }
+
+  .property-veiw-selectable {
+    cursor: pointer;
+  }
+
+  .selectable {
+    cursor: pointer;
+    filter: brightness(1.3);
+  }
+
+  .selectable:hover {
+    outline: 0.25vw solid #fff;
+    position: relative;
+    //box-shadow: 0 0 15px 3px #000;
+  }
+
+  .unselectable {
+    opacity: 0.15;
+    cursor: default;
+  }
+
+  .center-panel {
+    background-color: #000;
+    position: absolute;
+    top: 0;
+    padding: 1%;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .trade-options-container {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .trade-options {
+    display: inline-block;
+    background-color: #333;
+    padding: 10px;
+    border: 1px solid #777;
+    margin: 2px;
+    flex: 1;
+    font-size: 1.65vmin;
+
+    ul {
+      padding-left: 0.2vmin;
+
+      li {
+        display: flex;
+        margin-top: 0.1vmin;
+
+        label {
+          flex: 1;
+          padding: 0.1vmin;
+        }
+      }
+
+      input[type="checkbox"] {
+        width: 1.65vmin;
+        height: 1.65vmin;
+      }
+
+      input[type="text"] {
+        padding: 0.1vmin;
+      }
+    }
+  }
+
+  .trade-offer {
+    display: inline-flex;
+    background-color: #444;
+    flex-direction: column;
+    margin: 10px;
+    font-size: 1.5vmin;
+    line-height: 1.5vmin;
+    border: 1px solid #fff;
+
+    .title {
+      font-weight: bold;
+      background-color: #222;
+      color: #fff;
+      padding: 1vw;
+      font-size: 2vmin;
+    }
+
+    .subtitle {
+      font-weight: bold;
+      font-size: 2vmin;
+      line-height: 2vmin;
+      font-style: italic;
+      text-shadow: 1px 1px #000;
+      padding-top: 1%;
+      padding-bottom: 1%;
+    }
+
+    .outgoing {
+      display: block;
+      height: 50%;
+      box-sizing: border-box;
+      border-bottom: 1px solid #aaa;
+      flex-grow: 1;
+      padding: 5px;
+
+      .subtitle {
+        background-color: #a00;
+      }
+    }
+
+    .incoming {
+      display: block;
+      flex-grow: 1;
+      padding: 5px;
+
+      .subtitle {
+        background-color: #080;
+      }
+    }
+  }
+
+  .property-color-circle {
+    border-radius: 50%;
+    width: 1.5vmin;
+    height: 1.5vmin;
+    display: inline-block;
+    margin-right: 5px;
+    margin-left: 5px;
+  }
+
+  .house-container {
+    display: inline-block;
+    color: #02cc02;
+    position: absolute;
+    left: 1px;
+    bottom: 0;
+    fa-icon {
+      width: 1.8vmin;
+    }
+
+    .fa.fa-tag {
+      color: transparent;
+      -webkit-text-stroke-width: 2px;
+      -webkit-text-stroke-color: red;
+    }
+    .fa.custom-fa {
+      font-size: 12em;
+      -webkit-text-stroke-color: blue;
+      color: transparent;
+    }
+  }
+
+  .hotel-container {
+    margin-top: 10px;
+    display: block;
+    color: #AF1A28;
+    fa-icon {
+      width: 3vmin;
+    }
+  }
+
+  .button-container {
+    flex: 1;
+    width: 100%;
+    position: relative;
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  }
+
+  .tile-info {
+    border: 1px solid #fff;
+    display: inline-block;
+    padding: 1%;
+    margin: 3%;
+    min-width: 240px;
+    position: absolute;
+    top: 50px;
+    background-color: #000;
+    font-size: 1.6vmin;
+
+    .list-value {
+      float: right;
+      padding-right: 10%;
+      font-weight: bold;
+    }
+
+    .green {
+      color: $green;
+    }
+
+    .red {
+      color: $red;
+    }
+  }
+
+  .drawing {
+    width: 4vmin;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    font-family: "Font Awesome 5 Free";
+  }
+
+  interactions {
+    width: 100%;
+    height: 100%;
+    padding: 2vmin;
+  }
+}

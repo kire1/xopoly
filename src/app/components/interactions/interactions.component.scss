@@ -1,0 +1,213 @@
+@import "../../../styles";
+@import "../../../../node_modules/bootstrap/scss/bootstrap.scss";
+
+.interactions {
+  $gray: #6c757d;
+  height: 100%;
+  padding-right: 0px;
+  padding-left: 0px;
+  font-size: 1.5vmin;
+  color: $black;
+
+  .game-players {
+    height: 33%;
+  }
+
+  .game-events{
+    height: 33%;
+    background-color: whitesmoke
+  }
+
+  .action-btns {
+    height: 33%;
+
+    .center-cust > .row {
+      margin-right: 5vmin;
+    }
+
+    .disabled {
+      background-color: gray;
+      border-color: gray;
+      color: whitesmoke;
+    }
+
+    @media only screen and (max-width: 1366px) {
+      .btn-lg {
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: 0.25rem;
+      }
+    }
+
+    .btn {
+      margin: 0.5vmin;
+      width: 12vmin;
+      font-size: 1.7vmin;
+    }
+
+    .btn:focus {
+      box-shadow: none;
+    }
+
+    .dice {
+      svg {
+        width: 5vmin;
+        height: 5vmin;
+      }
+    }
+
+    @keyframes active-dice {
+      0% {
+        filter: brightness(1);
+      }
+      25% {
+        filter: brightness(0.95);
+      }
+      50% {
+        filter: brightness(0.9);
+      }
+      100% {
+        filter: brightness(0.85);
+      }
+    }
+
+    .Player-Dice-Red {
+      color: $player-red;
+    }
+
+    .Player-Dice-Green {
+      color: $player-green;
+    }
+
+    .Player-Dice-Blue {
+      color: $player-blue;
+    }
+
+    .Player-Dice-Yellow {
+      color: $player-yellow;
+    }
+
+    .Player-Dice-Cyan {
+      color: $player-cyan;
+    }
+
+    .Player-Dice-Magenta {
+      color: $player-magenta;
+    }
+
+    .dice-active {
+      animation-name: active-dice;
+      cursor: pointer;
+      animation-duration: 0.85s;
+      animation-direction: alternate;
+      animation-iteration-count: infinite;
+    }
+
+    .dice-disabled:hover {
+      cursor: default;
+    }
+
+    .dice-disabled {
+      opacity: 0.65;
+      color: gray;
+    }
+  }
+
+  .game-player {
+    font-size: 1.8vmin;
+    width: 12vmin;
+    text-align: center;
+    border-radius: 1rem;
+    margin-right: 1vmin;
+    background-color: rgba(0, 0, 0, 0.08);
+    border: none;
+
+    .card-body {
+      padding: 0.5rem;
+    }
+
+    .name,
+    .money {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 12vmin;
+    }
+
+    .green-money {
+      color: green;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .red-money {
+      color: red;
+      text-align: center;
+    }
+
+    .gray {
+      color: $gray;
+      text-align: center;
+    }
+
+    .timer .progress {
+      height: 0.3vmin;
+    }
+
+    fa-icon {
+      padding-right: 0.5vmin;
+      svg {
+        width: 2vmin;
+      }
+    }
+  }
+
+  .Player-Red {
+    color: $player-red;
+  }
+
+  .Player-Green {
+    color: $player-green;
+  }
+
+  .Player-Blue {
+    color: $player-blue;
+  }
+
+  .Player-Yellow {
+    color: $player-yellow;
+  }
+
+  .Player-Cyan {
+    color: $player-cyan;
+  }
+
+  .Player-Magenta {
+    color: $player-magenta;
+  }
+
+  .Player-Border-Red {
+    border: 3px solid $player-red;
+  }
+
+  .Player-Border-Green {
+    border: 3px solid $player-green;
+  }
+
+  .Player-Border-Blue {
+    border: 3px solid $player-blue;
+  }
+
+  .Player-Border-Yellow {
+    border: 3px solid $player-yellow;
+  }
+
+  .Player-Border-Cyan {
+    border: 3px solid $player-cyan;
+  }
+
+  .Player-Border-Magenta {
+    border: 3px solid $player-magenta;
+  }
+}
