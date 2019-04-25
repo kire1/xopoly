@@ -20,7 +20,6 @@ export class InteractionsComponent implements OnInit {
   @ViewChild('propertyBuyModalContent') propertyBuyModalContent: ElementRef;
   @ViewChild('propertyAuctionModalContent') propertyAuctionModalContent: ElementRef;
 
-  @Input() gamePlayerId: string;
   @Output() startMortgagePropertySelection = new EventEmitter<boolean>();
   @Output() startRedeemPropertySelection = new EventEmitter<boolean>();
   @Output() startBuildPropertySelection = new EventEmitter<boolean>();
@@ -43,6 +42,7 @@ export class InteractionsComponent implements OnInit {
   faDiceFive: IconDefinition = faDiceFive;
   faDiceSix: IconDefinition = faDiceSix;
 
+  gamePlayerId: string;
   gameState: GameState;
   lobbyState: LobbyState;
   gamePlayer: Player;
@@ -88,69 +88,67 @@ export class InteractionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.interactionsService.newLobbyState().subscribe((newLobbyState) => {
-      let lobby = newLobbyState.lobbies.find((l) => {
-        return l.players.find((p) => {
-          return p.computerUserID === newLobbyState.player.computerUserID;
-        }) != undefined;
-      });
+    this.initNewLobbyState();
+    this.initNewGameState();
+  }
 
-      if (!lobby) {
-        this.gameInProgress = false;
-      }
-    });
-
+  private initNewGameState() {
     this.interactionsService.newGameState().subscribe((newGameState) => {
       console.log("interactions - gameState - ", newGameState);
       this.gameState = newGameState;
-      this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId });
+      this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId; });
       this.gameInProgress = newGameState ? true : false;
-
       if (this.loadInstantMono && this.isPlayersTurn()) {
         this.instantMono();
         this.loadInstantMono = false;
       }
-
       this.updateStates();
-
       //u land on a propery
       if (this.canOpenBuyPropertyModal() && !this.propertyBuyModalRef) {
         this.openPropertyBuyModal();
       }
-
       //someone else auctioned a property
       if (this.canBetOnAuction() && !this.propertyAuctionModalRef) {
         this.closePropertyBuyModal();
         this.openPropertyAuctionModal();
       }
-
       if (!this.gameState.auctionInProgress) {
         this.closePropertyAuctionModal();
       }
-
       //update trades properties if, trade is open and things change
       if (this.tradeInProgress && this.tradeTargetPlayer) {
         let newTradeTargetPlayerAllProperties = this.getOwnedPropertiesForTrade(this.tradeTargetPlayer.id);
         let newTradeMyPlayerAllProperties = this.getOwnedPropertiesForTrade(this.gamePlayerId);
-
         if (this.compareById(this.tradeTargetPlayerAllProperties, newTradeTargetPlayerAllProperties)) {
           this.tradeTargetPlayerAllProperties = newTradeTargetPlayerAllProperties;
         }
-
         if (this.compareById(this.tradeMyPlayerAllProperties, newTradeMyPlayerAllProperties)) {
           this.tradeMyPlayerAllProperties = newTradeMyPlayerAllProperties;
         }
       }
-
       //updates offers if offers modal is open and things change
       if (this.gameState.tradeOffers && this.compareById(this.gameState.tradeOffers, this.offers)) {
-        this.offers = this.gameState.tradeOffers.filter(to => to.playerA.id === this.gamePlayerId || to.playerB.id === this.gamePlayerId)
+        this.offers = this.gameState.tradeOffers.filter(to => to.playerA.id === this.gamePlayerId || to.playerB.id === this.gamePlayerId);
       }
-
       if (this.gameState.tradeOffers.length === 0) {
         this.closeTradeOffersModal();
       }
     });
+  }
+
+  private initNewLobbyState() {
+    this.interactionsService.newLobbyState().subscribe((newLobbyState) => {
+      this.gamePlayerId = newLobbyState.player.gameID;
+      let lobby = newLobbyState.lobbies.find((l) => {
+        return l.players.find((p) => {
+          return p.computerUserID === newLobbyState.player.computerUserID;
+        }) != undefined;
+      });
+      if (!lobby) {
+        this.gameInProgress = false;
+      }
+    });
+    this.interactionsService.requestStateUpdate();
   }
 
   rollDice(): void {

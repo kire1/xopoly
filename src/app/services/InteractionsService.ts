@@ -89,6 +89,10 @@ export class InteractionsService implements OnInit {
     return this.gameEngine.lobbyState.pipe(skip(1));
   }
 
+  requestStateUpdate(): Observable<any> {
+    return this.gameEngine.invoke("requestStateUpdate");
+  }
+
   hubConnected(): Observable<any> {
     return this.gameEngine.hubConnected;
   }

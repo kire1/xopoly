@@ -2,7 +2,7 @@
 	<div *ngIf="gameState" class="game-ui">
 		<div class="board">
 			<div class="center">
-				<interactions [gamePlayerId]="gamePlayerId"
+				<interactions
 					(startMortgagePropertySelection)="startMortgageViewPropertySelection($event)"
 					(startRedeemPropertySelection)="startRedeemViewPropertySelection($event)"
 					(startBuildPropertySelection)="startBuildViewPropertySelection($event)"

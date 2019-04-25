@@ -61,7 +61,7 @@ export class BoardComponent implements OnInit {
       this.gamePlayerId = newLobbyState.player.gameID;
 
       let lobby = newLobbyState.lobbies.find((l) => {
-        return l.players.find((p) => {
+        return l.players.find((p) => { 
           return p.computerUserID === newLobbyState.player.computerUserID;
         }) != undefined;
       });
@@ -72,15 +72,8 @@ export class BoardComponent implements OnInit {
     });
 
     this.interactionsService.newGameState().subscribe((newGameState) => {
-      if (this.updateGameState) {
         this.gameState = newGameState;
         this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId });
-
-        if (!this.gameState.currentPlayer.currentDiceRoll) {
-          // currentPlayer rolled
-          
-        }
-      }
     });
   }
 
