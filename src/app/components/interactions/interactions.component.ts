@@ -352,9 +352,11 @@ export class InteractionsComponent implements OnInit {
   }
 
   sendOffer() {
-    this.interactionsService.sendTrade(this.tradeTargetPlayer.id, this.tradeMyPlayerSelectedProperties, this.tradeTargetPlayerSelectedProperties, this.tradeMyPlayerMoney, this.tradeTargetPlayerMoney).subscribe(() => {
-      this.closeTradeModal();
-    });
+    if (this.tradeTargetPlayer) {
+      this.interactionsService.sendTrade(this.tradeTargetPlayer.id, this.tradeMyPlayerSelectedProperties, this.tradeTargetPlayerSelectedProperties, this.tradeMyPlayerMoney, this.tradeTargetPlayerMoney).subscribe(() => {
+        this.closeTradeModal();
+      });
+    }
   }
 
   private tradeReset(): void {
@@ -492,10 +494,8 @@ export class InteractionsComponent implements OnInit {
   }
 
   private updateStates(): void {
-    this.canRollDice();
-    this.getlastDiceRoll();
-    this.canEndTurn();
     this.canMortgage();
+    this.canEndTurn();
     this.canRedeem();
     this.canTrade();
     this.canBuild();
@@ -503,6 +503,8 @@ export class InteractionsComponent implements OnInit {
     this.canViewOffers();
     this.canPayJailFee();
     this.canGetOutOfJailFree();
+    this.canRollDice();
+    this.getlastDiceRoll();
   }
 
   private canViewOffers(): void {

@@ -39,7 +39,7 @@
     <div class="col center-cust">
       <div class="row align-items-center justify-content-center">
         <div
-          [ngClass]="rollBtnEnabled ? 'dice-active Player-Dice-' + gameState.currentPlayer.color : 'dice-disabled Player-Dice-' + gameState.currentPlayer.color"
+          [ngClass]="rollBtnEnabled ? 'active Player-Dice-' + gameState.currentPlayer.color : 'dice-disabled Player-Dice-' + gameState.currentPlayer.color"
           (click)="rollDice()">
           <span class="dice" *ngFor="let dice of lastDiceRoll">
             <fa-icon *ngIf="dice == 1" class="drawing" [icon]="faDiceOne"></fa-icon>
@@ -63,25 +63,25 @@
     </div>
     <div class="col center-cust">
       <div class="row align-items-center justify-content-around">
-        <button type="button" class="btn btn-lg btn-success" [ngClass]="!buildBtnEnabled ? 'disabled': 'build-btn'"
+        <button type="button" class="btn btn-lg btn-primary" [ngClass]="!buildBtnEnabled ? 'disabled': 'build-btn'"
           (click)="startBuild()">Build</button>
         <button type="button" class="btn btn-lg btn-warning" [ngClass]="!sellBtnEnabled ? 'disabled': 'sell-btn'"
           (click)="startSell()">Sell</button>
         <button type="button" class="btn btn-lg btn-info" [ngClass]="!tradeBtnEnabled ? 'disabled': 'trade-btn'"
           (click)="openTradeModal(tradeModalContent)">Trade</button>
-        <button type="button" class="btn btn-lg btn-info"
-          [ngClass]="!viewOffersBtnEnabled ? 'disabled': 'view-offers-btn'"
-          (click)="openTradeOffersModal(tradeOffersModalContent)">View Offers</button>
+        <button type="button" class="btn btn-lg btn-success"
+          [ngClass]="!viewOffersBtnEnabled ? 'disabled': 'offers-btn active'"
+          (click)="openTradeOffersModal(tradeOffersModalContent)">Offers</button>
       </div>
       <div class="row align-items-center justify-content-around">
         <button type="button" class="btn btn-lg btn-warning"
           [ngClass]="!mortgageBtnEnabled ? 'disabled': 'mortgage-btn'" (click)="startMortgage()">Mortgage</button>
-        <button type="button" class="btn btn-lg btn-success" [ngClass]="!redeemBtnEnabled ? 'disabled': 'redeem-btn'"
+        <button type="button" class="btn btn-lg btn-primary" [ngClass]="!redeemBtnEnabled ? 'disabled': 'redeem-btn'"
           (click)="startRedeem()">Redeem</button>
-        <button type="button" class="btn btn-lg btn-primary"
+        <button type="button" class="btn btn-lg btn-info"
           [ngClass]="!payJailFeeBtnEnabled ? 'disabled': 'payJailFee-btn'" (click)="payJailFee()">Pay Jail Fee</button>
-        <button type="button" class="btn btn-lg btn-primary"
-          [ngClass]="!getOutOfJailFreeBtnEnabled ? 'disabled': 'get-out-of-jail-free-btn'"
+        <button type="button" class="btn btn-lg btn-success"
+          [ngClass]="!getOutOfJailFreeBtnEnabled ? 'disabled': 'get-out-of-jail-free-btn active'"
           (click)="useGetOutOfJailFreeCard()">Use GOJF Card</button>
       </div>
     </div>

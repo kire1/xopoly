@@ -24,6 +24,12 @@
       margin-right: 5vmin;
     }
 
+    .mortgage-btn,
+    .sell-btn {
+      background-color: #ffc107;
+      border-color: #ffc107;
+    }
+
     .disabled {
       background-color: gray;
       border-color: gray;
@@ -56,7 +62,7 @@
       }
     }
 
-    @keyframes active-dice {
+    @keyframes active {
       0% {
         filter: brightness(1);
       }
@@ -95,8 +101,8 @@
       color: $player-magenta;
     }
 
-    .dice-active {
-      animation-name: active-dice;
+    .active {
+      animation-name: active;
       cursor: pointer;
       animation-duration: 0.85s;
       animation-direction: alternate;
