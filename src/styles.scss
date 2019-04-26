@@ -298,16 +298,47 @@ $player-magenta: #ff8fff;
 
 .view-offer {
   .offers {
+    padding-bottom: 1vmin;
     overflow-x: auto;
     flex-wrap: nowrap;
 
     .offer {
-      margin-bottom: 2vmin;
+      .Player-Background-Red {
+        background-color: $player-red;
+      }
+
+      .Player-Background-Green {
+        background-color: $player-green;
+      }
+
+      .Player-Background-Blue {
+        background-color: $player-blue;
+      }
+
+      .Player-Background-Yellow {
+        background-color: $player-yellow;
+      }
+
+      .Player-Background-Cyan {
+        background-color: $player-cyan;
+      }
+
+      .Player-Background-Magenta {
+        background-color: $player-magenta;
+      }
+
+      .recieved-offer{
+        .player-name {
+          padding: 2px 6px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
     }
   }
 
   .card {
-    width: 14rem;
     height: 100%;
 
     .card-header {
@@ -342,8 +373,8 @@ $player-magenta: #ff8fff;
     }
 
     .card-footer {
-      button:first-child {
-        margin-right: 2vmin;
+      button:last-child {
+        margin-left: 1.5vmin;
       }
 
       > .disabled {

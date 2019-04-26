@@ -9,10 +9,17 @@ import { GameState } from '../models/game/GameState';
 @Injectable()
 export class GameEngineService {
   private hubConnection: signalR.HubConnection;
+  private hubConnected: Subject<boolean> = new BehaviorSubject<boolean>(false);
+  private lobbyState: Subject<LobbyState> = new BehaviorSubject<LobbyState>(null);
+  private gameState: Subject<GameState> = new BehaviorSubject<GameState>(null);
+  private rejectedTradeState: Subject<LobbyState> = new BehaviorSubject<any>(null);
+  private acceptedTradeState: Subject<GameState> = new BehaviorSubject<any>(null);
 
-  hubConnected: Subject<boolean> = new BehaviorSubject<boolean>(false);
-  lobbyState: Subject<LobbyState> = new BehaviorSubject<LobbyState>(null);
-  gameState: Subject<GameState> = new BehaviorSubject<GameState>(null);
+  hubConnected$ = this.hubConnected.asObservable();
+  lobbyState$ = this.lobbyState.asObservable();
+  gameState$ = this.gameState.asObservable();
+  rejectedTradeState$ = this.rejectedTradeState.asObservable();
+  acceptedTradeState$ = this.acceptedTradeState.asObservable();
 
   constructor() {
     this.start("https://localhost:5001/lobbyhub");
@@ -30,6 +37,14 @@ export class GameEngineService {
 
     this.hubConnection.on('updateGameState', (newGameState) => {
       this.gameState.next(newGameState);
+    });
+
+    this.hubConnection.on('rejectedTrade', (rejectedTrade) => {
+      this.rejectedTradeState.next(rejectedTrade);
+    });
+
+    this.hubConnection.on('updateGameState', (acceptedTrade) => {
+      this.acceptedTradeState.next(acceptedTrade);
     });
 
     this.hubConnection

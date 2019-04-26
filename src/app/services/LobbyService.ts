@@ -42,14 +42,14 @@ export class LobbyService implements OnInit {
   }
 
   newGameState(): Observable<any> {
-    return this.gameEngine.gameState.pipe(skip(1));
+    return this.gameEngine.gameState$.pipe(skip(1));
   }
 
   newLobbyState(): Observable<any> {
-    return this.gameEngine.lobbyState.pipe(skip(1));
+    return this.gameEngine.lobbyState$.pipe(skip(1));
   }
 
   hubConnected(): Observable<any> {
-    return this.gameEngine.hubConnected;
+    return this.gameEngine.hubConnected$;
   }
 }

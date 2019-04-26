@@ -43,6 +43,8 @@ export class InteractionsComponent implements OnInit {
   gamePlayerId: string;
   gameState: GameState;
   lobbyState: LobbyState;
+  rejectedTradeState: any;
+  acceptedTradeState: any;
   gamePlayer: Player;
   lastDiceRoll: number[];
 
@@ -90,6 +92,14 @@ export class InteractionsComponent implements OnInit {
   }
 
   private initNewGameState() {
+    this.interactionsService.rejectedTradeState().subscribe((rejectedTradeState) => {
+
+    });
+    
+    this.interactionsService.acceptedTradeState().subscribe((acceptedTradeState) => {
+
+    });
+
     this.interactionsService.newGameState().subscribe((newGameState) => {
       console.log("interactions - gameState - ", newGameState);
       this.gameState = newGameState;

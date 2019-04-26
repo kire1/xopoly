@@ -82,11 +82,19 @@ export class InteractionsService implements OnInit {
   }
 
   newGameState(): Observable<any> {
-    return this.gameEngine.gameState.pipe(skip(1));
+    return this.gameEngine.gameState$.pipe(skip(1));
   }
 
   newLobbyState(): Observable<any> {
-    return this.gameEngine.lobbyState.pipe(skip(1));
+    return this.gameEngine.lobbyState$.pipe(skip(1));
+  }
+
+  rejectedTradeState(): Observable<any> {
+    return this.gameEngine.rejectedTradeState$.pipe(skip(1));
+  }
+
+  acceptedTradeState(): Observable<any> {
+    return this.gameEngine.acceptedTradeState$.pipe(skip(1));
   }
 
   requestStateUpdate(): Observable<any> {
@@ -94,7 +102,7 @@ export class InteractionsService implements OnInit {
   }
 
   hubConnected(): Observable<any> {
-    return this.gameEngine.hubConnected;
+    return this.gameEngine.hubConnected$;
   }
 
   turnOnWeightedDice(): Observable<any> {

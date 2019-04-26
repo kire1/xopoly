@@ -83,16 +83,15 @@
       }
     }
 
-    
     @keyframes active {
       0% {
-        filter: brightness(1.20);
+        filter: brightness(1.2);
       }
       25% {
         filter: brightness(1.15);
       }
       50% {
-        filter: brightness(1.10);
+        filter: brightness(1.1);
       }
       100% {
         filter: brightness(1.05);
@@ -134,7 +133,7 @@
     .active {
       animation-name: active;
       cursor: pointer;
-      animation-duration: 0.50s;
+      animation-duration: 0.5s;
       animation-direction: alternate;
       animation-iteration-count: infinite;
     }
@@ -244,6 +243,19 @@
 
   .Player-Border-Magenta {
     border: 3px solid $player-magenta;
+  }
+
+  .auction-results {
+
+    .title{
+      background-color: rgba(0, 0, 0, 0.08);
+      padding: 1vmin;
+    }
+
+    .list-group-item{
+      background-color: $board;
+      padding: 0.1rem .5rem;
+    }
   }
 }
 

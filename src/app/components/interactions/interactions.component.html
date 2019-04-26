@@ -33,7 +33,24 @@
     </div>
   </div>
   <div class="row align-items-center justify-content-center no-gutters game-events">
+    <div class="col auction-results">
+      <div *ngIf="gameState.auctionInProgress">
+        <h6 class="title text-center">Auction In Progress...</h6>
+        <ul class="list-group">
+          <li class="list-group-item" *ngFor="let player of gameState.auction.auctionParticipants">
+            <span class="player-name">{{player.name}}</span>
+            <span
+              class="player-name">{{player.hasPlacedBet ? '......bid recieved.' : '......calculating.'}}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col chance-community">
 
+    </div>
+    <div class="col trade-a-d">
+
+    </div>
   </div>
   <div class="row align-items-center justify-content-center no-gutters action-btns">
     <div class="col center-cust">
@@ -53,8 +70,8 @@
       </div>
       <div class="row align-items-center justify-content-center">
         <div class="btn-group-vertical">
-          <button type="button" class="btn btn-lg btn-danger" [ngClass]="!endTurnBtnEnabled ? 'disabled': 'done-btn active'"
-            (click)="endTurn()">End Turn</button>
+          <button type="button" class="btn btn-lg btn-danger"
+            [ngClass]="!endTurnBtnEnabled ? 'disabled': 'done-btn active'" (click)="endTurn()">End Turn</button>
           <button *ngIf="gamePlayer && 0 > gamePlayer.money" type="button" class="btn btn-lg btn-danger active"
             [ngClass]="gameInProgress && gameState.currentPlayer.id !== this.gamePlayerId ? 'disabled': ''"
             (click)="declareBankruptcy()">Bankruptcy</button>
@@ -223,7 +240,7 @@
           <form id="betForm" #betForm="ngForm" (ngSubmit)="betOnAuction(betForm.value.bet)">
             <input class="form-control" type="number" id="bet" name="bet" ngModel>
           </form>
-          <button type="submit" class="btn btn-block btn-primary bet" form="betForm">Bet</button>
+          <button type="submit" class="btn btn-block btn-primary bet" form="betForm">Bid</button>
         </div>
       </div>
     </div>
@@ -308,18 +325,19 @@
     </div>
     <div class="modal-body">
       <div class="row offers">
-        <div class="col offer" *ngFor="let offer of offers">
-          <div class="card" [ngClass]="'Player-Border-' + offer.playerA.color">
-            <div class="card-header text-center"
-              [ngClass]="(offer.playerA.id === gamePlayerId ? 'sent' : 'recieved') + '-offer'">
-              {{offer.playerA.id === gamePlayerId ? 'SENT TO: ' + offer.playerB.name : 'RECIEVED FROM: ' + offer.playerA.name}}
+        <div class="col-5 offer" *ngFor="let offer of offers">
+          <div class="card text-center" [ngClass]="'Player-Border-' + offer.playerA.color">
+            <div class="card-header" [ngClass]="(offer.playerA.id === gamePlayerId ? 'sent' : 'recieved') + '-offer'">
+              <span>{{offer.playerA.id === gamePlayerId ? 'SENT TO: ' : 'RECIEVED FROM: '}}</span>
+              <span class="player-name"
+                [ngClass]="offer.playerA.id === gamePlayerId ? 'Player-Background-' + offer.playerB.color : 'Player-Background-' + offer.playerA.color">{{offer.playerA.id === gamePlayerId ? offer.playerB.name : offer.playerA.name }}</span>
             </div>
             <div class="card-body">
               <div class="sending">
                 <div class="card-title">
                   {{offer.playerA.id === gamePlayerId ? 'Sent' : 'Send'}}
                 </div>
-                <div class="props text-center">
+                <div class="props">
                   <div *ngIf="offer.playerA.id === gamePlayerId">
                     <div *ngFor="let playerAProp of offer.playerAProperties" class="text-center prop-name"
                       [ngClass]="playerAProp.color ?  'Tile-' + playerAProp.color : playerAProp.type  === 'Railroad' ? 'Tile-Railroad' : 'Tile-Utility'">
@@ -356,10 +374,11 @@
                 </div>
               </div>
             </div>
-            <div class="card-footer text-center">
-              <button [ngClass]="{'disabled' : offer.playerA.id === gamePlayerId}" class="btn btn-primary"
+            <div class="card-footer">
+              <button *ngIf="offer.playerA.id === gamePlayerId" class="btn btn-primary disabled">Cancel</button>
+              <button *ngIf="offer.playerA.id !== gamePlayerId" class="btn btn-primary"
                 (click)="acceptOffer(offer.id, offer.playerA.id)">Accept</button>
-              <button [ngClass]="{'disabled' : offer.playerA.id === gamePlayerId}" class="btn btn-danger"
+              <button *ngIf="offer.playerA.id !== gamePlayerId" class="btn btn-danger"
                 (click)="rejectOffer(offer.id, offer.playerA.id)">Decline</button>
             </div>
           </div>
