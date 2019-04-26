@@ -2,17 +2,13 @@
 	<div *ngIf="gameState" class="game-ui">
 		<div class="board">
 			<div class="center">
-				<interactions
-					(startMortgagePropertySelection)="startMortgageViewPropertySelection($event)"
-					(startRedeemPropertySelection)="startRedeemViewPropertySelection($event)"
-					(startBuildPropertySelection)="startBuildViewPropertySelection($event)"
-					(startSellPropertySelection)="startSellViewPropertySelection($event)">
-				</interactions>
+				<interactions (startPropertySelection)="startViewPropertySelection($event)"></interactions>
 			</div>
 
 			<div class="space corner go" id="0" [ngClass]="getTileClasses(0)">
 				<div class="container">
-					<span *ngFor="let player of gameState.players; let i = index" [ngClass]="0 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					<span *ngFor="let player of gameState.players; let i = index"
+						[ngClass]="0 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 					<div class="instructions">Collect $200.00 salary as you pass</div>
 					<div class="go-word">go</div>
 					<fa-icon class="drawing arrow-drawing" [icon]="faLongArrowAltLeft"></fa-icon>
@@ -205,8 +201,10 @@
 		<div class="modal-body">
 			<div class="property-card">
 				<div class="details">
-					<div class="card text-center" [ngClass]="'Tile-Border-' + (propertyForPropertyViewModal.color ? propertyForPropertyViewModal.color : propertyForPropertyViewModal.type)">
-						<div class="card-header" [ngClass]="'Tile-' + (propertyForPropertyViewModal.color ? propertyForPropertyViewModal.color : propertyForPropertyViewModal.type)">
+					<div class="card text-center"
+						[ngClass]="'Tile-Border-' + (propertyForPropertyViewModal.color ? propertyForPropertyViewModal.color : propertyForPropertyViewModal.type)">
+						<div class="card-header"
+							[ngClass]="'Tile-' + (propertyForPropertyViewModal.color ? propertyForPropertyViewModal.color : propertyForPropertyViewModal.type)">
 							<span class="card-title">{{propertyForPropertyViewModal.name}}</span>
 						</div>
 						<div class="card-body">

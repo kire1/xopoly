@@ -9,6 +9,7 @@ import { Player } from 'src/app/models/game/Player';
 import { LobbyState } from 'src/app/models/lobby/LobbyState';
 import { TradeOffer } from 'src/app/models/game/TradeOffer';
 import { filter } from 'rxjs/operators';
+import { BoardComponent, TileTypes } from '../board/board.component';
 
 @Component({
   selector: 'interactions',
@@ -20,10 +21,7 @@ export class InteractionsComponent implements OnInit {
   @ViewChild('propertyBuyModalContent') propertyBuyModalContent: ElementRef;
   @ViewChild('propertyAuctionModalContent') propertyAuctionModalContent: ElementRef;
 
-  @Output() startMortgagePropertySelection = new EventEmitter<boolean>();
-  @Output() startRedeemPropertySelection = new EventEmitter<boolean>();
-  @Output() startBuildPropertySelection = new EventEmitter<boolean>();
-  @Output() startSellPropertySelection = new EventEmitter<boolean>();
+  @Output() startPropertySelection = new EventEmitter<string>();
 
   nonPropertyIds = [0, 2, 4, 7, 10, 17, 20, 22, 30, 33, 36, 38];
   twoMonoPropertyIds = [1, 3, 37, 39];
@@ -60,12 +58,9 @@ export class InteractionsComponent implements OnInit {
   gameInProgress: boolean;
   viewOffersBtnEnabled: boolean;
 
-  mortgagePropertySelectionInProgress: boolean;
-  redeemPropertySelectionInProgress: boolean;
-  sellPropertySelectionInProgress: boolean;
-  buildPropertySelectionInProgress: boolean;
   tradeInProgress: boolean;
   tradeOffersInProgress: boolean;
+  propertySelectionInProgress: boolean;
 
   tradeTargetPlayer: Player;
   tradeTargetPlayerAllProperties: any[];
@@ -78,6 +73,8 @@ export class InteractionsComponent implements OnInit {
 
   offers: TradeOffer[];
   canAfford: boolean;
+
+  //dev use
   loadInstantMono: boolean = false;
 
   constructor(private modalService: NgbModal, private interactionsService: InteractionsService) {
@@ -193,51 +190,36 @@ export class InteractionsComponent implements OnInit {
   }
 
   startMortgage(): void {
-    let otherPropertySelectionInProgress = this.redeemPropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress;
-    if (this.mortgageBtnEnabled && !this.mortgagePropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.disableAllBtnsExcept("mortgage");
-      this.mortgagePropertySelectionInProgress = true;
-      this.startMortgagePropertySelection.emit(true);
-    } else if (this.mortgageBtnEnabled && this.mortgagePropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.mortgagePropertySelectionInProgress = false;
-      this.startMortgagePropertySelection.emit(false);
+    if (this.mortgageBtnEnabled) {
+      this.propertySelectionInProgress = true;
+      this.startPropertySelection.emit(TileTypes.MortgageProperty);
     }
   }
 
   startRedeem(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress;
-    if (this.redeemBtnEnabled && !this.redeemPropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.disableAllBtnsExcept("redeem");
-      this.redeemPropertySelectionInProgress = true;
-      this.startRedeemPropertySelection.emit(true);
-    } else if (this.redeemBtnEnabled && this.redeemPropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.redeemPropertySelectionInProgress = false;
-      this.startRedeemPropertySelection.emit(false);
+    if (this.redeemBtnEnabled) {
+      this.propertySelectionInProgress = true;
+      this.startPropertySelection.emit(TileTypes.RedeemProperty);
     }
   }
 
   startBuild(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.redeemPropertySelectionInProgress || this.sellPropertySelectionInProgress;
-    if (this.buildBtnEnabled && !this.buildPropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.disableAllBtnsExcept("build");
-      this.buildPropertySelectionInProgress = true;
-      this.startBuildPropertySelection.emit(true);
-    } else if (this.buildBtnEnabled && this.buildPropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.buildPropertySelectionInProgress = false;
-      this.startBuildPropertySelection.emit(false);
+    if (this.buildBtnEnabled) {
+      this.propertySelectionInProgress = true;
+      this.startPropertySelection.emit(TileTypes.BuildHouse);
     }
   }
 
   startSell(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.redeemPropertySelectionInProgress || this.buildPropertySelectionInProgress;
-    if (this.sellBtnEnabled && !this.sellPropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.disableAllBtnsExcept("sell");
-      this.sellPropertySelectionInProgress = true;
-      this.startSellPropertySelection.emit(true);
-    } else if (this.sellBtnEnabled && this.sellPropertySelectionInProgress && !otherPropertySelectionInProgress) {
-      this.sellPropertySelectionInProgress = false;
-      this.startSellPropertySelection.emit(false);
+    if (this.sellBtnEnabled) {
+      this.propertySelectionInProgress = true;
+      this.startPropertySelection.emit(TileTypes.SellHouse);
     }
+  }
+
+  stopPorpertySelection() {
+    this.startPropertySelection.emit(TileTypes.None);
+    this.propertySelectionInProgress = false;
   }
 
   payJailFee() {
@@ -426,7 +408,7 @@ export class InteractionsComponent implements OnInit {
       }
     }
 
-    if(!this.tradePlayers || (this.tradePlayers && this.tradePlayers.length === 0)) {
+    if (!this.tradePlayers || (this.tradePlayers && this.tradePlayers.length === 0)) {
       this.tradePlayers = this.gameState.players.filter(p => p.id !== this.gamePlayerId);
     }
   }
@@ -509,28 +491,6 @@ export class InteractionsComponent implements OnInit {
     }
   }
 
-  private disableAllBtnsExcept(btn: string): void {
-    if (btn != "build") {
-      this.buildBtnEnabled = false;
-    }
-    if (btn != "sell") {
-      this.sellBtnEnabled = false;
-    }
-    if (btn != "redeem") {
-      this.redeemBtnEnabled = false;
-    }
-    if (btn != "mortgage") {
-      this.mortgageBtnEnabled = false;
-    }
-
-    this.endTurnBtnEnabled = false;
-    this.rollBtnEnabled = false;
-    this.payJailFeeBtnEnabled = false;
-    this.getOutOfJailFreeBtnEnabled = false;
-    this.tradeBtnEnabled = false;
-    this.viewOffersBtnEnabled = false;
-  }
-
   private updateStates(): void {
     this.canRollDice();
     this.getlastDiceRoll();
@@ -546,18 +506,19 @@ export class InteractionsComponent implements OnInit {
   }
 
   private canViewOffers(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.redeemPropertySelectionInProgress || this.sellPropertySelectionInProgress || this.buildPropertySelectionInProgress;
-    this.viewOffersBtnEnabled = this.gameState.tradeOffers.length > 0 && this.offers.length > 0 && !otherPropertySelectionInProgress;
+    this.viewOffersBtnEnabled =
+      this.gameState.tradeOffers.length > 0 &&
+      this.offers.length > 0
   }
 
   private canTrade(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.redeemPropertySelectionInProgress || this.sellPropertySelectionInProgress || this.buildPropertySelectionInProgress;
     let otherPlayers = this.getOtherPlayers();
-    this.tradeBtnEnabled = this.gamePlayer && this.gamePlayer.money > 0 && otherPlayers && otherPlayers.length > 0 && !otherPropertySelectionInProgress;
+    this.tradeBtnEnabled = this.gamePlayer &&
+      this.gamePlayer.money > 0 &&
+      otherPlayers && otherPlayers.length > 0
   }
 
   private canBuild(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.redeemPropertySelectionInProgress || this.sellPropertySelectionInProgress;
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
     let canBuild = false;
 
@@ -570,11 +531,10 @@ export class InteractionsComponent implements OnInit {
         coloredProperties[key].some(prop => prop.buildingCount < 5));
     }
 
-    this.buildBtnEnabled = (canBuild && !otherPropertySelectionInProgress) || this.buildPropertySelectionInProgress;
+    this.buildBtnEnabled = canBuild;
   }
 
   private canSell(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.redeemPropertySelectionInProgress || this.buildPropertySelectionInProgress;
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
     let canSell = false;
 
@@ -586,16 +546,14 @@ export class InteractionsComponent implements OnInit {
         coloredProperties[key].every(prop => prop.ownerPlayerID == this.gamePlayerId));
     }
 
-    this.sellBtnEnabled = (canSell && !otherPropertySelectionInProgress) || this.sellPropertySelectionInProgress;
+    this.sellBtnEnabled = canSell;
   }
 
   private canMortgage(): void {
-    let otherPropertySelectionInProgress = this.redeemPropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress;
     let canMortgage = false;
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
 
     canMortgage = this.isPlayersTurn() &&
-      !otherPropertySelectionInProgress &&
       ownedProperties.length > 0 &&
       ownedProperties.some(x => !x.isMortgaged) &&
       !this.gameState.auctionInProgress;
@@ -612,49 +570,43 @@ export class InteractionsComponent implements OnInit {
       }
     }
 
-    this.mortgageBtnEnabled = canMortgage || this.mortgagePropertySelectionInProgress;
+    this.mortgageBtnEnabled = canMortgage;
   }
 
   private canRedeem(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress;
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
 
     this.redeemBtnEnabled = (this.isPlayersTurn() &&
-      !otherPropertySelectionInProgress &&
       ownedProperties.length > 0 &&
-      (ownedProperties.some(x => x.isMortgaged))) || this.redeemPropertySelectionInProgress;
+      (ownedProperties.some(x => x.isMortgaged)));
   }
 
   private canPayJailFee(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress || this.redeemPropertySelectionInProgress;
     this.payJailFeeBtnEnabled = this.isPlayersTurn() &&
-      this.gameState.currentPlayer.isInJail && !otherPropertySelectionInProgress;
+      this.gameState.currentPlayer.isInJail;
   }
 
   private canGetOutOfJailFree(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress || this.redeemPropertySelectionInProgress;
     this.getOutOfJailFreeBtnEnabled = this.isPlayersTurn() &&
       this.gameState.currentPlayer.isInJail &&
-      this.gameState.currentPlayer.hasGetOutOfJailFreeCard && !otherPropertySelectionInProgress;
+      this.gameState.currentPlayer.hasGetOutOfJailFreeCard;
   }
 
   private canRollDice(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress || this.redeemPropertySelectionInProgress;
     this.rollBtnEnabled = this.isPlayersTurn() &&
       !this.gameState.waitForBuyOrAuctionStart &&
       this.gameState.currentPlayer.money >= 0 &&
       (!this.gameState.currentPlayer.currentDiceRoll || (this.gameState.currentPlayer.currentDiceRoll.isDouble && !this.gameState.currentPlayer.isInJail)) &&
-      !this.gameState.auctionInProgress && !otherPropertySelectionInProgress;
+      !this.gameState.auctionInProgress;
   }
 
   private canEndTurn(): void {
-    let otherPropertySelectionInProgress = this.mortgagePropertySelectionInProgress || this.buildPropertySelectionInProgress || this.sellPropertySelectionInProgress || this.redeemPropertySelectionInProgress;
     let curPlayer = this.gameState.currentPlayer;
     this.endTurnBtnEnabled = this.isPlayersTurn() &&
       curPlayer.currentDiceRoll &&
       (!curPlayer.currentDiceRoll.isDouble || curPlayer.isInJail) &&
       !this.gameState.auctionInProgress &&
-      !this.gameState.waitForBuyOrAuctionStart && !otherPropertySelectionInProgress;
+      !this.gameState.waitForBuyOrAuctionStart;
   }
 
   private canOpenBuyPropertyModal(): boolean {

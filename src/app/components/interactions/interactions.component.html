@@ -1,4 +1,7 @@
 <div *ngIf="gameInProgress" class="container-fluid interactions">
+  <div *ngIf="propertySelectionInProgress" class="propertySelectionInProgress">
+    <button type="button" class="btn btn-lg btn-danger" (click)="stopPorpertySelection()">Done</button>
+  </div>
   <div class="row align-items-center justify-content-center no-gutters game-players">
     <div class="card game-player" *ngFor="let gp of gameState.players"
       [ngClass]="gp.id === gameState.currentPlayer.id ? 'Player-Border-' + gp.color : ''">
@@ -52,7 +55,8 @@
         <div class="btn-group-vertical">
           <button type="button" class="btn btn-lg btn-danger" [ngClass]="!endTurnBtnEnabled ? 'disabled': 'done-btn'"
             (click)="endTurn()">End Turn</button>
-          <button *ngIf="gamePlayer && 0 > gamePlayer.money" type="button" class="btn btn-lg btn-danger" [ngClass]="gameInProgress && gameState.currentPlayer.id !== this.gamePlayerId ? 'disabled': ''"
+          <button *ngIf="gamePlayer && 0 > gamePlayer.money" type="button" class="btn btn-lg btn-danger"
+            [ngClass]="gameInProgress && gameState.currentPlayer.id !== this.gamePlayerId ? 'disabled': ''"
             (click)="declareBankruptcy()">Bankruptcy</button>
         </div>
       </div>
@@ -65,7 +69,8 @@
           (click)="startSell()">Sell</button>
         <button type="button" class="btn btn-lg btn-info" [ngClass]="!tradeBtnEnabled ? 'disabled': 'trade-btn'"
           (click)="openTradeModal(tradeModalContent)">Trade</button>
-        <button type="button" class="btn btn-lg btn-info" [ngClass]="!viewOffersBtnEnabled ? 'disabled': 'trade-btn'"
+        <button type="button" class="btn btn-lg btn-info"
+          [ngClass]="!viewOffersBtnEnabled ? 'disabled': 'view-offers-btn'"
           (click)="openTradeOffersModal(tradeOffersModalContent)">View Offers</button>
       </div>
       <div class="row align-items-center justify-content-around">

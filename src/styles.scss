@@ -21,12 +21,18 @@ $player-magenta: #ff8fff;
 
 @media only screen and (min-width: 940px) {
   ngb-modal-window .modal-dialog {
-      max-width: 650px;
+    max-width: 650px;
   }
 }
 
 .property-card-view {
   font-size: 1.7vmin;
+
+  .modal-header {
+    .close:focus {
+      outline: none;
+    }
+  }
 
   .Border-Bottom-Brown {
     border-bottom: 1px solid $brown;

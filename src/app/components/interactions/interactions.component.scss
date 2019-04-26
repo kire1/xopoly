@@ -13,9 +13,8 @@
     height: 33%;
   }
 
-  .game-events{
+  .game-events {
     height: 33%;
-    background-color: whitesmoke
   }
 
   .action-btns {
@@ -209,5 +208,27 @@
 
   .Player-Border-Magenta {
     border: 3px solid $player-magenta;
+  }
+}
+
+.propertySelectionInProgress {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50000;
+  opacity: 0.85;
+  background: black;
+
+  button {
+    top: 46%;
+    position: absolute;
+    left: 40%;
+    margin: 0.5vmin;
+    width: 12vmin;
+    font-size: 1.7vmin;
   }
 }

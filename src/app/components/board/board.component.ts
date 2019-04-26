@@ -11,8 +11,15 @@ import { Player } from 'src/app/models/game/Player';
 import { LobbyState } from 'src/app/models/lobby/LobbyState';
 
 export enum TileTypes {
-  MortgageProperty = 'MortgageProperty', RedeemProperty = 'RedeemProperty', BuildHouse = 'BuildHouse',
-  SellHouse = 'SellHouse', ColorProperty = 'ColorProperty', Chance = 'Chance', Railroad = 'Railroad', CommunityChest = 'CommunityChest'
+  MortgageProperty = 'MortgageProperty',
+  RedeemProperty = 'RedeemProperty',
+  BuildHouse = 'BuildHouse',
+  SellHouse = 'SellHouse',
+  ColorProperty = 'ColorProperty',
+  Chance = 'Chance',
+  Railroad = 'Railroad',
+  CommunityChest = 'CommunityChest',
+  None = "None"
 }
 
 @Component({
@@ -46,7 +53,6 @@ export class BoardComponent implements OnInit {
   gameState: GameState;
   lobbyState: LobbyState;
   gamePlayer: Player;
-  propertySelectionInProgress: boolean;
   propertySelectionType: string;
 
   updateGameState = true;
@@ -85,15 +91,15 @@ export class BoardComponent implements OnInit {
 
       if (property.ownerPlayerID) {
         tileClass += " Player-Background-" +
-          this.gameState.players.filter(p => p.id == property.ownerPlayerID)[0].color;
+          this.gameState.players.filter(p => p.id === property.ownerPlayerID)[0].color;
       }
 
-      if (this.propertySelectionInProgress) {
-        if (property.ownerPlayerID == this.gamePlayerId &&
-          (this.canMortgageTile(property) && this.propertySelectionType == TileTypes.MortgageProperty) ||
-          (property.isMortgaged && property.ownerPlayerID == this.gamePlayerId && this.propertySelectionType == TileTypes.RedeemProperty) ||
-          (this.canBuildTile(property) && this.propertySelectionType == TileTypes.BuildHouse) ||
-          (property.ownerPlayerID == this.gamePlayerId && property.buildingCount > 0 && this.propertySelectionType == TileTypes.SellHouse)) {
+      if (this.propertySelectionType) {
+        if (property.ownerPlayerID === this.gamePlayerId &&
+          (this.canMortgageTile(property) && this.propertySelectionType === TileTypes.MortgageProperty) ||
+          (property.isMortgaged && property.ownerPlayerID === this.gamePlayerId && this.propertySelectionType === TileTypes.RedeemProperty) ||
+          (this.canBuildTile(property) && this.propertySelectionType === TileTypes.BuildHouse) ||
+          (property.ownerPlayerID === this.gamePlayerId && property.buildingCount > 0 && this.propertySelectionType === TileTypes.SellHouse)) {
           tileClass += " selectable";
         } else {
           tileClass += " unselectable";
@@ -105,17 +111,17 @@ export class BoardComponent implements OnInit {
         }
       }
 
-      if (property.type == TileTypes.ColorProperty) {
+      if (property.type === TileTypes.ColorProperty) {
         tileClass += " property";
-      } else if (property.type == TileTypes.Chance) {
+      } else if (property.type === TileTypes.Chance) {
         tileClass += " chance";
-      } else if (property.type == TileTypes.Railroad) {
+      } else if (property.type === TileTypes.Railroad) {
         tileClass += " railroad";
-      } else if (property.type == TileTypes.CommunityChest) {
+      } else if (property.type === TileTypes.CommunityChest) {
         tileClass += " community-chest";
-      } else if (property.name == "Income Tax") {
+      } else if (property.name === "Income Tax") {
         tileClass += " fee income-tax";
-      } else if (property.name == "Luxury Tax") {
+      } else if (property.name === "Luxury Tax") {
         tileClass += " fee luxury-tax";
       }
     }
@@ -124,7 +130,7 @@ export class BoardComponent implements OnInit {
   }
 
   handlePropertyClick(property: any): void {
-    if (!this.propertySelectionInProgress) {
+    if (!this.propertySelectionType) {
       let isNonPropTile = this.nonPropertyTileId.some((id) => { return id === property.id });
       if (!isNonPropTile) {
         this.openPropertyViewModal(property);
@@ -178,32 +184,26 @@ export class BoardComponent implements OnInit {
     }
   }
 
-  startMortgageViewPropertySelection(start: boolean): void {
-    this.propertySelectionInProgress = start;
-    this.propertySelectionType = TileTypes.MortgageProperty;
-  }
-
-  startRedeemViewPropertySelection(start: boolean): void {
-    this.propertySelectionInProgress = start;
-    this.propertySelectionType = TileTypes.RedeemProperty;
-  }
-
-  startBuildViewPropertySelection(start: boolean): void {
-    this.propertySelectionInProgress = start;
-    this.propertySelectionType = TileTypes.BuildHouse;
-  }
-
-  startSellViewPropertySelection(start: boolean): void {
-    this.propertySelectionInProgress = start;
-    this.propertySelectionType = TileTypes.SellHouse;
+  startViewPropertySelection(type: string): void {
+    if (type === TileTypes.MortgageProperty) {
+      this.propertySelectionType = TileTypes.MortgageProperty;
+    } else if (type === TileTypes.RedeemProperty) {
+      this.propertySelectionType = TileTypes.RedeemProperty;
+    } else if (type === TileTypes.BuildHouse) {
+      this.propertySelectionType = TileTypes.BuildHouse;
+    } else if (type === TileTypes.SellHouse) {
+      this.propertySelectionType = TileTypes.SellHouse;
+    }else if (type === TileTypes.None){
+      this.propertySelectionType = undefined;
+    }
   }
 
   private canMortgageTile(property: any): boolean {
     let ownedProperties = this.playerOwnedProperties();
-    let canMortgage = !property.isMortgaged && (!property.buildingCount || property.buildingCount == 0);
+    let canMortgage = !property.isMortgaged && (!property.buildingCount || property.buildingCount === 0);
 
-    if (property.color && property.ownerPlayerID == this.gamePlayerId && ownedProperties.length > 1) {
-      let coloredProperties = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
+    if (property.color && property.ownerPlayerID === this.gamePlayerId && ownedProperties.length > 1) {
+      let coloredProperties = this.gameState.tiles.filter(x => x.type === 'ColorProperty');
       coloredProperties = _.groupBy(coloredProperties, 'color');
 
       if (coloredProperties[property.color].some(prop => prop.buildingCount > 0))
@@ -217,10 +217,10 @@ export class BoardComponent implements OnInit {
     let ownedProperties = this.playerOwnedProperties();
     var canBuild = false;
 
-    if (property.color && property.ownerPlayerID == this.gamePlayerId && ownedProperties.length > 1 && property.buildingCount < 5) {
-      let coloredProperties = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
+    if (property.color && property.ownerPlayerID === this.gamePlayerId && ownedProperties.length > 1 && property.buildingCount < 5) {
+      let coloredProperties = this.gameState.tiles.filter(x => x.type === 'ColorProperty');
       coloredProperties = _.groupBy(coloredProperties, 'color');
-      canBuild = coloredProperties[property.color].every(prop => prop.ownerPlayerID == this.gamePlayerId && !prop.isMortgaged);
+      canBuild = coloredProperties[property.color].every(prop => prop.ownerPlayerID === this.gamePlayerId && !prop.isMortgaged);
     }
 
     return canBuild;
@@ -229,7 +229,7 @@ export class BoardComponent implements OnInit {
   private playerOwnedProperties(): any[] {
     let ownedProps = [];
     if (this.gamePlayerId != null && this.gameState.tiles) {
-      ownedProps = this.gameState.tiles.filter(t => t.ownerPlayerID == this.gamePlayerId)
+      ownedProps = this.gameState.tiles.filter(t => t.ownerPlayerID === this.gamePlayerId)
     }
     return ownedProps;
   }
