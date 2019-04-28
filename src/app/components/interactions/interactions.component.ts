@@ -42,9 +42,10 @@ export class InteractionsComponent implements OnInit {
 
   gamePlayerId: string;
   gameState: GameState;
+  prevGameState: GameState;
   lobbyState: LobbyState;
-  rejectedTradeState: any;
-  acceptedTradeState: any;
+  rejectedOffer: TradeOffer;
+  acceptedOffer: TradeOffer;
   gamePlayer: Player;
   lastDiceRoll: number[];
 
@@ -75,15 +76,20 @@ export class InteractionsComponent implements OnInit {
 
   offers: TradeOffer[];
   canAfford: boolean;
+  gameLog: string[];
+  msgAuctionWinner: string;
 
   //dev use
   loadInstantMono: boolean = false;
+
+
 
   constructor(private modalService: NgbModal, private interactionsService: InteractionsService) {
     this.lastDiceRoll = [2, 2];
     this.tradeTargetPlayerSelectedProperties = [];
     this.tradeMyPlayerSelectedProperties = [];
     this.offers = [];
+    this.gameLog = [];
   }
 
   ngOnInit(): void {
@@ -92,16 +98,31 @@ export class InteractionsComponent implements OnInit {
   }
 
   private initNewGameState() {
-    this.interactionsService.rejectedTradeState().subscribe((rejectedTradeState) => {
-
+    this.interactionsService.gameLogEntry().subscribe((gameLog) => {
+      if (gameLog.length !== this.gameLog.length) {
+        this.gameLog = this.colorPlayersNames(gameLog);
+      }
     });
-    
-    this.interactionsService.acceptedTradeState().subscribe((acceptedTradeState) => {
 
+    this.interactionsService.rejectedTradeId().subscribe((rejectedTradeId) => {
+      var rejectedOffer = this.gameState.tradeOffers.find(x => x.id == rejectedTradeId);
+      if (rejectedOffer) {
+        this.acceptedOffer = undefined;
+        this.rejectedOffer = rejectedOffer;
+      }
+    });
+
+    this.interactionsService.acceptedTradeId().subscribe((acceptedTradeId) => {
+      var acceptedOffer = this.gameState.tradeOffers.find(x => x.id == acceptedTradeId);
+      if (acceptedOffer) {
+        this.rejectedOffer = undefined;
+        this.acceptedOffer = acceptedOffer;
+      }
     });
 
     this.interactionsService.newGameState().subscribe((newGameState) => {
       console.log("interactions - gameState - ", newGameState);
+      this.prevGameState = this.gameState;
       this.gameState = newGameState;
       this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId; });
       this.gameInProgress = newGameState ? true : false;
@@ -140,7 +161,40 @@ export class InteractionsComponent implements OnInit {
       if (this.gameState.tradeOffers.length === 0) {
         this.closeTradeOffersModal();
       }
+      this.checkForAuctionWinner();
     });
+  }
+
+  colorPlayersNames(gameLog: string[]): string[] {
+    if (this.gameState) {
+      let players = this.gameState.players;
+      for (let i = 0; i < gameLog.length; i++) {
+        let gameLogEntryTextArray = gameLog[i].split(" ");
+        for (let j = 0; j < gameLogEntryTextArray.length; j++) {
+          let text = gameLogEntryTextArray[j];
+          let player = players.find(p => text.includes(p.name));
+          if (player) {
+            gameLogEntryTextArray[j] = '<span class="Player-Background-' + player.color + '">' + player.name + '</span>';
+          }
+        }
+        gameLog[i] = gameLogEntryTextArray.join(" ");
+      }
+    }
+
+    return gameLog;
+  }
+
+  private checkForAuctionWinner(): void {
+    if (this.prevGameState && this.gameState) {
+      if (this.prevGameState.auction && !this.gameState.auction) {
+        var auctionedProperty = this.gameState.tiles.find(t => t.id == this.prevGameState.currentTile.id);
+        var auctionWinner = this.gameState.players.find(x => x.id == auctionedProperty.ownerPlayerID);
+        var auctionWinnerBetAmount = this.prevGameState.players.find(x => x.id == auctionWinner.id).money - auctionWinner.money;
+        this.msgAuctionWinner = '<span class="Player-Background-' + auctionWinner.color + '">' + auctionWinner.name + '</span>' + " won the auction for " + auctionedProperty.name + " in the amount of $" + auctionWinnerBetAmount + "!";
+      }else if(this.gameState.auction){
+        this.msgAuctionWinner = undefined;
+      }
+    }
   }
 
   private initNewLobbyState() {
@@ -182,6 +236,9 @@ export class InteractionsComponent implements OnInit {
   endTurn(): void {
     if (this.endTurnBtnEnabled) {
       this.interactionsService.endTurn().subscribe(() => {
+        this.rejectedOffer = undefined;
+        this.acceptedOffer = undefined;
+        this.msgAuctionWinner = undefined;
       });
     }
   }
@@ -595,7 +652,8 @@ export class InteractionsComponent implements OnInit {
 
   private canPayJailFee(): void {
     this.payJailFeeBtnEnabled = this.isPlayersTurn() &&
-      this.gameState.currentPlayer.isInJail;
+      this.gameState.currentPlayer.isInJail
+      && !this.gameState.currentPlayer.currentDiceRoll;
   }
 
   private canGetOutOfJailFree(): void {

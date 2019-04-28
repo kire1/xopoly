@@ -89,12 +89,16 @@ export class InteractionsService implements OnInit {
     return this.gameEngine.lobbyState$.pipe(skip(1));
   }
 
-  rejectedTradeState(): Observable<any> {
-    return this.gameEngine.rejectedTradeState$.pipe(skip(1));
+  rejectedTradeId(): Observable<any> {
+    return this.gameEngine.rejectedTradeId$.pipe(skip(1));
   }
 
-  acceptedTradeState(): Observable<any> {
-    return this.gameEngine.acceptedTradeState$.pipe(skip(1));
+  acceptedTradeId(): Observable<any> {
+    return this.gameEngine.acceptedTradeId$.pipe(skip(1));
+  }
+
+  gameLogEntry(): Observable<any> {
+    return this.gameEngine.gameLogEntry$.pipe(skip(1));
   }
 
   requestStateUpdate(): Observable<any> {

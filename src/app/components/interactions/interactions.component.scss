@@ -10,15 +10,17 @@
   color: $black;
 
   .game-players {
-    height: 33%;
+    height: 26%;
   }
 
   .game-events {
-    height: 33%;
+    height: 39%;
+    margin: 1vmin;
+    margin-top: 1.5vmin;
   }
 
   .action-btns {
-    height: 33%;
+    height: 34%;
 
     .center-cust > .row {
       margin-right: 5vmin;
@@ -152,7 +154,7 @@
     font-size: 1.8vmin;
     width: 12vmin;
     text-align: center;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     margin-right: 1vmin;
     background-color: rgba(0, 0, 0, 0.08);
     border: none;
@@ -245,17 +247,163 @@
     border: 3px solid $player-magenta;
   }
 
-  .auction-results {
+  .Player-Background-Red {
+    background-color: $player-red;
+  }
 
-    .title{
+  .Player-Background-Green {
+    background-color: $player-green;
+  }
+
+  .Player-Background-Blue {
+    background-color: $player-blue;
+  }
+
+  .Player-Background-Yellow {
+    background-color: $player-yellow;
+  }
+
+  .Player-Background-Cyan {
+    background-color: $player-cyan;
+  }
+
+  .Player-Background-Magenta {
+    background-color: $player-magenta;
+  }
+
+  .game-events {
+    font-size: 1.4vmin;
+
+    .chance-comminuty {
+      .card {
+        .card-body {
+          padding: 1vmin;
+          .card-title {
+            margin: 0;
+            font-size: 1.6vmin;
+            margin-bottom: 0.7vmin;
+          }
+          .card-text {
+            margin: 0;
+            margin-bottom: 0.7vmin;
+          }
+        }
+      }
+    }
+
+    .auction-results {
+      .card {
+        .card-body{
+          padding: 1vmin;
+        }
+        p {
+          margin: 0.4vmin;
+        }
+      }
+    }
+
+    .game-log {
+      .card{
+        .card-body{
+          padding: 1vmin;
+        }
+      }
+      ul {
+        overflow: auto;
+        height: 20vmin;
+        font-size: 1vmin;
+      }
+    }
+
+    .trade-events {
+      margin-right: 1vmin;
+    }
+
+    .col {
+      height: 100%;
+      border: 2px solid rgba(0, 0, 0, 0.08);
+      border-radius: 0.5rem;
+    }
+
+    .chance-comminuty {
+      margin-left: 1vmin;
+      margin-right: 1vmin;
+    }
+
+    .card {
+      background-color: unset;
+      border: none;
+    }
+
+    .title {
       background-color: rgba(0, 0, 0, 0.08);
       padding: 1vmin;
     }
 
-    .list-group-item{
+    .list-group-item {
       background-color: $board;
-      padding: 0.1rem .5rem;
+      padding: 0.1rem 0.5rem;
     }
+  }
+
+  .Tile-Brown {
+    background-color: $brown;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-LightBlue {
+    background-color: $light-blue;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-Pink {
+    background-color: $pink;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-Orange {
+    background-color: $orange;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-Red {
+    background-color: $red;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-Yellow {
+    background-color: $yellow;
+    color: black;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-Green {
+    background-color: $green;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-Railroad {
+    background-color: $black;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-Utility {
+    background-color: lightgray;
+    color: black;
+    margin-top: 0.5vmin;
+  }
+
+  .Tile-DarkBlue {
+    background-color: $dark-blue;
+    color: whitesmoke;
+    margin-top: 0.5vmin;
   }
 }
 
