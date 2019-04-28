@@ -8,8 +8,7 @@ import { GameState } from "src/app/models/game/GameState";
 import { Player } from 'src/app/models/game/Player';
 import { LobbyState } from 'src/app/models/lobby/LobbyState';
 import { TradeOffer } from 'src/app/models/game/TradeOffer';
-import { filter } from 'rxjs/operators';
-import { BoardComponent, TileTypes } from '../board/board.component';
+import { TileTypes } from '../board/board.component';
 
 @Component({
   selector: 'interactions',
@@ -78,11 +77,10 @@ export class InteractionsComponent implements OnInit {
   canAfford: boolean;
   gameLog: string[];
   msgAuctionWinner: string;
+  waitingToOpen: boolean;
 
   //dev use
   loadInstantMono: boolean = false;
-
-
 
   constructor(private modalService: NgbModal, private interactionsService: InteractionsService) {
     this.lastDiceRoll = [2, 2];
@@ -132,8 +130,12 @@ export class InteractionsComponent implements OnInit {
       }
       this.updateStates();
       //u land on a propery
-      if (this.canOpenBuyPropertyModal() && !this.propertyBuyModalRef) {
-        this.openPropertyBuyModal();
+      if (this.canOpenBuyPropertyModal() && !this.propertyBuyModalRef && !this.waitingToOpen) {
+        this.waitingToOpen = true;
+        this.interactionsService.newGameStateForOpenProp().subscribe((newGameState) => {
+          this.openPropertyBuyModal();
+          this.waitingToOpen = false;
+        });
       }
       //someone else auctioned a property
       if (this.canBetOnAuction() && !this.propertyAuctionModalRef) {

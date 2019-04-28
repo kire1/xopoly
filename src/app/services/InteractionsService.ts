@@ -1,6 +1,6 @@
 import { OnInit, Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
-import { skip } from 'rxjs/operators';
+import { skip, delay, take } from 'rxjs/operators';
 
 import { GameEngineService } from '../services/GameEngineService';
 
@@ -83,6 +83,10 @@ export class InteractionsService implements OnInit {
 
   newGameState(): Observable<any> {
     return this.gameEngine.gameState$.pipe(skip(1));
+  }
+
+  newGameStateForOpenProp(): Observable<any> {
+    return this.gameEngine.gameState$.pipe(take(1), delay(1000));
   }
 
   newLobbyState(): Observable<any> {
