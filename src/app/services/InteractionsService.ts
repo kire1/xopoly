@@ -38,6 +38,7 @@ export class InteractionsService implements OnInit {
   }
 
   betOnAuction(amount: number): Observable<any> {
+    amount = amount < 0 ? 0 : amount;
     return this.gameEngine.invoke("betOnAuction", amount);
   }
 
@@ -86,7 +87,7 @@ export class InteractionsService implements OnInit {
   }
 
   newGameStateForOpenProp(): Observable<any> {
-    return this.gameEngine.gameState$.pipe(take(1), delay(1000));
+    return this.gameEngine.gameState$.pipe(take(1), delay(800));
   }
 
   newLobbyState(): Observable<any> {

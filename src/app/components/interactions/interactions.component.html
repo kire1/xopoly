@@ -63,16 +63,15 @@
         </div>
       </div>
     </div>
-    <div class="col trade-events">
+    <div class="col trade-events info">
       <div class="card">
-        <div class="card-header title">Trade</div>
-        <div class="card-body" *ngIf="acceptedOffer || rejectedOffer">
-          <p *ngIf="rejectedOffer" class="card-title"><span
-              [ngClass]="'Player-Background-' + rejectedOffer.playerB.color">{{rejectedOffer.playerB.name}}</span> rejected
-            your offer.</p>
-          <p *ngIf="acceptedOffer" class="card-title"><span
-              [ngClass]="'Player-Background-' + acceptedOffer.playerB.color">{{acceptedOffer.playerB.name}}</span> accepted
-            your offer.</p>
+        <div class="card-header title">Information</div>
+        <div class="card-body" *ngIf="acceptedOffer || rejectedOffer || goSalaryNoti || goToJailNoti || paidNoti">
+          <p *ngIf="rejectedOffer" class="card-title"><span [ngClass]="'Player-Background-' + rejectedOffer.playerB.color">{{rejectedOffer.playerB.name}}</span> rejected your offer.</p>
+          <p *ngIf="acceptedOffer" class="card-title"><span [ngClass]="'Player-Background-' + acceptedOffer.playerB.color">{{acceptedOffer.playerB.name}}</span> accepted your offer.</p>
+          <p *ngIf="goSalaryNoti" class="card-title" [innerHTML]="goSalaryNoti"></p>
+          <p *ngIf="goToJailNoti" class="card-title" [innerHTML]="goToJailNoti"></p>
+          <p *ngIf="paidNoti" class="card-title" [innerHTML]="paidNoti"></p>
         </div>
       </div>
     </div>

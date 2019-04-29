@@ -220,7 +220,7 @@ export class BoardComponent implements OnInit {
     if (property.color && property.ownerPlayerID === this.gamePlayerId && ownedProperties.length > 1 && property.buildingCount < 5) {
       let coloredProperties = this.gameState.tiles.filter(x => x.type === 'ColorProperty');
       coloredProperties = _.groupBy(coloredProperties, 'color');
-      canBuild = coloredProperties[property.color].every(prop => prop.ownerPlayerID === this.gamePlayerId && !prop.isMortgaged);
+      canBuild = coloredProperties[property.color].every(prop => prop.ownerPlayerID === this.gamePlayerId && !prop.isMortgaged && this.gamePlayer.money >= prop.buildingCost);
     }
 
     return canBuild;

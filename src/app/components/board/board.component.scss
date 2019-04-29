@@ -14,6 +14,8 @@
   $height_size: $width_size * 1.58;
   $drawing-size: 5vmin;
 
+
+
   // =================
   // GLOBAL
   // =================
@@ -555,7 +557,7 @@
     height: 3vmin;
     top: 30%;
     position: absolute;
-    filter: brightness(1.1);
+    filter: brightness(1.15);
     z-index: 1000;
     border-radius: 50%;
     border: 2px solid black;

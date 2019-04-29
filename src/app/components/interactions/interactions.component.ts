@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, ViewEncapsulation, Input, Output, EventEmitter } from '@angular/core';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap/';
-import { IconDefinition, faUser, faMoneyBillWave, faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faUser, faMoneyBillWave, faDiceOne, faDiceTwo, faDiceThree, faDiceFour, faDiceFive, faDiceSix, faUnderline } from '@fortawesome/free-solid-svg-icons';
 import * as _ from 'lodash';
 
 import { InteractionsService } from "../../services/InteractionsService";
@@ -9,6 +9,7 @@ import { Player } from 'src/app/models/game/Player';
 import { LobbyState } from 'src/app/models/lobby/LobbyState';
 import { TradeOffer } from 'src/app/models/game/TradeOffer';
 import { TileTypes } from '../board/board.component';
+import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 
 @Component({
   selector: 'interactions',
@@ -78,6 +79,9 @@ export class InteractionsComponent implements OnInit {
   gameLog: string[];
   msgAuctionWinner: string;
   waitingToOpen: boolean;
+  goSalaryNoti: string;
+  goToJailNoti: string;
+  paidNoti: string;
 
   //dev use
   loadInstantMono: boolean = false;
@@ -97,9 +101,10 @@ export class InteractionsComponent implements OnInit {
 
   private initNewGameState() {
     this.interactionsService.gameLogEntry().subscribe((gameLog) => {
-      if (gameLog.length !== this.gameLog.length) {
-        this.gameLog = this.colorPlayersNames(gameLog);
-      }
+      let newGameLog = this.colorPlayersNames(gameLog);
+      this.gameLog = newGameLog;
+      this.checkForNotifications(newGameLog);
+
     });
 
     this.interactionsService.rejectedTradeId().subscribe((rejectedTradeId) => {
@@ -119,7 +124,7 @@ export class InteractionsComponent implements OnInit {
     });
 
     this.interactionsService.newGameState().subscribe((newGameState) => {
-      console.log("interactions - gameState - ", newGameState);
+      //console.log("interactions - gameState - ", newGameState);
       this.prevGameState = this.gameState;
       this.gameState = newGameState;
       this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId; });
@@ -163,22 +168,67 @@ export class InteractionsComponent implements OnInit {
       if (this.gameState.tradeOffers.length === 0) {
         this.closeTradeOffersModal();
       }
-      this.checkForAuctionWinner();
+      this.checkForAuctionWinnerNoti();
     });
   }
 
-  colorPlayersNames(gameLog: string[]): string[] {
+  private checkForNotifications(gameLog: string[]): void {
+    if (this.gameState) {
+      for (let i = 0; i < gameLog.length && i < 3; i++) {
+        let gameLogEntry = gameLog[i];
+        let playersFound = this.gameState.players.filter(p => gameLogEntry.includes(p.name));
+
+        let goSalaryNotiFound = gameLogEntry.includes(" collected a salary of ");
+        let goToJailNotiFound = gameLogEntry.includes(" to jail");
+        let paidNotiFound = gameLogEntry.includes(" paid");
+
+        let startIndex = gameLogEntry.lastIndexOf(":") + 1;
+
+        if (playersFound.length > 0) {
+          startIndex = gameLogEntry.indexOf("<");
+        }
+
+        if (goSalaryNotiFound) {
+          this.goToJailNoti = undefined;
+          this.paidNoti = undefined;
+          this.goSalaryNoti = gameLogEntry.substring(startIndex);
+        }
+
+        if (goToJailNotiFound) {
+          this.goSalaryNoti = undefined;
+          this.paidNoti = undefined;
+          this.goToJailNoti = gameLogEntry.substring(startIndex);
+        }
+
+        if (paidNotiFound) {
+          this.goToJailNoti = undefined;
+          this.goSalaryNoti = undefined;
+          this.paidNoti = gameLog[i].substring(startIndex);
+        }
+      }
+    }
+  }
+
+  private colorPlayersNames(gameLog: string[]): string[] {
     if (this.gameState) {
       let players = this.gameState.players;
+
       for (let i = 0; i < gameLog.length; i++) {
-        let gameLogEntryTextArray = gameLog[i].split(" ");
-        for (let j = 0; j < gameLogEntryTextArray.length; j++) {
-          let text = gameLogEntryTextArray[j];
-          let player = players.find(p => text.includes(p.name));
-          if (player) {
-            gameLogEntryTextArray[j] = '<span class="Player-Background-' + player.color + '">' + player.name + '</span>';
-          }
+        let gameLogEntry = gameLog[i];
+        let gameLogEntryTextArray = gameLog[i].replace(/'/g, "").split(" ");
+        let playersFound = players.filter(p => gameLogEntry.includes(p.name));
+
+        for (let player of playersFound) {
+          //4/28/2019 5:04:56 PM: Player jki as aas landed on St. James Place!
+          let playerNameArray = player.name.split(" "); // ["jki","as","aas"]
+          let nameIndexStart = gameLogEntryTextArray.indexOf(playerNameArray[0]);
+          let htmlName = '<span class="Player-Background-' + player.color + '">' + player.name + '</span>';
+
+          // ['4/28/2019', '5:04:56 PM:', 'Player', 'jki', 'as', 'aas', 'landed', 'on', 'St.', 'James', 'Place!']
+          gameLogEntryTextArray.splice(nameIndexStart, playerNameArray.length, htmlName);
+          // ['<span class="Player-Background-Red">jki as aas</span>', 'landed', 'on', 'St.', 'James', 'Place!']
         }
+
         gameLog[i] = gameLogEntryTextArray.join(" ");
       }
     }
@@ -186,14 +236,14 @@ export class InteractionsComponent implements OnInit {
     return gameLog;
   }
 
-  private checkForAuctionWinner(): void {
+  private checkForAuctionWinnerNoti(): void {
     if (this.prevGameState && this.gameState) {
       if (this.prevGameState.auction && !this.gameState.auction) {
         var auctionedProperty = this.gameState.tiles.find(t => t.id == this.prevGameState.currentTile.id);
         var auctionWinner = this.gameState.players.find(x => x.id == auctionedProperty.ownerPlayerID);
-        var auctionWinnerBetAmount = this.prevGameState.players.find(x => x.id == auctionWinner.id).money - auctionWinner.money;
+        var auctionWinnerBetAmount = this.prevGameState.players.find(x => auctionWinner && x.id == auctionWinner.id).money - auctionWinner.money;
         this.msgAuctionWinner = '<span class="Player-Background-' + auctionWinner.color + '">' + auctionWinner.name + '</span>' + " won the auction for " + auctionedProperty.name + " in the amount of $" + auctionWinnerBetAmount + "!";
-      }else if(this.gameState.auction){
+      } else if (this.gameState.auction) {
         this.msgAuctionWinner = undefined;
       }
     }
@@ -241,6 +291,9 @@ export class InteractionsComponent implements OnInit {
         this.rejectedOffer = undefined;
         this.acceptedOffer = undefined;
         this.msgAuctionWinner = undefined;
+        this.goToJailNoti = undefined;
+        this.goSalaryNoti = undefined;
+        this.paidNoti = undefined;
       });
     }
   }
@@ -472,9 +525,7 @@ export class InteractionsComponent implements OnInit {
           }
         }
         if (pendingTradesIds.length > 0) {
-          for (let id of pendingTradesIds) {
-            this.tradePlayers = this.gameState.players.filter(p => p.id !== id && p.id !== this.gamePlayerId);
-          }
+          this.tradePlayers = this.gameState.players.filter(p => p.id !== this.gamePlayerId && !pendingTradesIds.some(id => id === p.id));
         }
       }
     }
