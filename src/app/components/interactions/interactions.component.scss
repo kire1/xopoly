@@ -17,6 +17,22 @@
     height: 39%;
     margin: 1vmin;
     margin-top: 1.5vmin;
+
+    ::-webkit-scrollbar {
+      width: .5vmin;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
   }
 
   .action-btns {
@@ -283,7 +299,7 @@
             margin: 0;
             margin-bottom: 0.7vmin;
           }
-          
+
           .card-text {
             margin: 0;
             margin-bottom: 0.7vmin;
@@ -294,7 +310,7 @@
 
     .auction-results {
       .card {
-        .card-body{
+        .card-body {
           padding: 1vmin;
         }
         p {
@@ -304,8 +320,8 @@
     }
 
     .game-log {
-      .card{
-        .card-body{
+      .card {
+        .card-body {
           padding: 1vmin;
         }
       }

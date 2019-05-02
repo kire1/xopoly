@@ -123,7 +123,7 @@ export class InteractionsComponent implements OnInit {
     });
 
     this.interactionsService.newGameState().subscribe((newGameState) => {
-      //console.log("interactions - gameState - ", newGameState);
+      console.log("interactions - gameState - ", newGameState);
       this.prevGameState = this.gameState;
       this.gameState = newGameState;
       this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId; });
@@ -142,11 +142,11 @@ export class InteractionsComponent implements OnInit {
         });
       }
       //someone else auctioned a property
-      if (this.canBetOnAuction() && !this.propertyAuctionModalRef) {
+      if (this.canBetOnAuction() && !this.propertyAuctionModalRef && !this.waitingToOpen) {
         this.closePropertyBuyModal();
         this.openPropertyAuctionModal();
       }
-      if (!this.gameState.auctionInProgress) {
+      if (!this.gameState.auctionInProgress || !this.canBetOnAuction()) {
         this.closePropertyAuctionModal();
       }
       //update trades properties if, trade is open and things change
@@ -733,7 +733,7 @@ export class InteractionsComponent implements OnInit {
 
   private canOpenBuyPropertyModal(): boolean {
     let isPropAvaliableToBuy = !this.gameState.currentTile.ownerPlayerID;
-    if (isPropAvaliableToBuy && this.isPlayersTurn() && this.gameState.waitForBuyOrAuctionStart) {
+    if (isPropAvaliableToBuy && this.isPlayersTurn() && this.gameState.waitForBuyOrAuctionStart && this.gameState.currentPlayer.currentTurnElapsedSeconds != 0) {
       this.canAfford = this.gameState.currentPlayer.money >= this.gameState.currentTile.cost;
       return true;
     }
@@ -741,7 +741,7 @@ export class InteractionsComponent implements OnInit {
   }
 
   private canBetOnAuction(): boolean {
-    return this.gameState.auction && this.gamePlayer.money > 0 && !this.gameState.auction.auctionParticipants.find(x => x.id == this.gamePlayerId).hasPlacedBet;
+    return this.gameState.auction && this.gamePlayer.money > 0 && this.gameState.auction.auctionParticipants.some(x => x.id === this.gamePlayerId) && !this.gameState.auction.auctionParticipants.find(x => x.id === this.gamePlayerId).hasPlacedBet;
   }
 
   private isPlayersTurn(): boolean {

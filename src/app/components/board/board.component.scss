@@ -551,6 +551,17 @@
   // =================
   // UTILITY
   // =================
+  .game-piece-visiting {
+    width: 3vmin;
+    height: 3vmin;
+    bottom: 3.7%;
+    position: absolute;
+    filter: brightness(1.15);
+    z-index: 1000;
+    border-radius: 50%;
+    border: 2px solid black;
+  }
+
 
   .game-piece {
     width: 3vmin;
@@ -585,6 +596,30 @@
 
   .player-5 {
     right: 60%;
+  }
+
+  .player-visiting-0 {
+    left: 4.5%;
+  }
+
+  .player-visiting-1 {
+    left: 6%;
+  }
+
+  .player-visiting-2 {
+    left: 7.5%;
+  }
+
+  .player-visiting-3 {
+    left: 9%;
+  }
+
+  .player-visiting-4 {
+    left: 10.5%;
+  }
+
+  .player-visiting-5 {
+    left: 12%;
   }
 
   .long-name {

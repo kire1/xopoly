@@ -59,11 +59,13 @@
 							<i class="person fa fa-frown-o"></i>
 						</div>
 						<div class="name">Jail</div>
-						<span *ngFor="let player of gameState.players; let i = index"
-							[ngClass]="10 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+						<span *ngFor="let player of gameState.players; let i = index" [ngClass]="(10 === player.boardPosition) && player.isInJail ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 					</div>
 				</div>
-				<div class="visiting">Visiting</div>
+				<div class="visiting">
+					Visiting
+					<span *ngFor="let player of gameState.players; let i = index" [ngClass]="(10 === player.boardPosition) && !player.isInJail ? 'game-piece-visiting' + ' player-visiting-' + i + ' Player-Background-' + player.color : ''"></span>
+				</div>
 			</div>
 
 			<div class="row vertical-row left-row">
