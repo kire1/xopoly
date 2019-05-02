@@ -554,7 +554,6 @@
   .game-piece-visiting {
     width: 3vmin;
     height: 3vmin;
-    bottom: 3.7%;
     position: absolute;
     filter: brightness(1.15);
     z-index: 1000;
@@ -575,7 +574,7 @@
   }
 
   .player-0 {
-    right: 10%;
+    right: 10%
   }
 
   .player-1 {
@@ -599,27 +598,33 @@
   }
 
   .player-visiting-0 {
-    left: 4.5%;
+    right: 106%;
+    top: 64%;
   }
 
   .player-visiting-1 {
-    left: 6%;
+    right: 79%;
+    top: 91%;
   }
 
   .player-visiting-2 {
-    left: 7.5%;
+    right: 51%;
+    top: 118%;
   }
 
   .player-visiting-3 {
-    left: 9%;
+    left: 51%;
+    top: 118%;
   }
 
   .player-visiting-4 {
-    left: 10.5%;
+    left: 79%;
+    top: 91%;
   }
 
   .player-visiting-5 {
-    left: 12%;
+    left: 106%;
+    top: 64%;
   }
 
   .long-name {

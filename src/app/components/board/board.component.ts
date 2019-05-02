@@ -215,7 +215,7 @@ export class BoardComponent implements OnInit {
 
   private canBuildTile(property: any): boolean {
     let ownedProperties = this.playerOwnedProperties();
-    var canBuild = false;
+    let canBuild = false;
 
     if (property.color && property.ownerPlayerID === this.gamePlayerId && ownedProperties.length > 1 && property.buildingCount < 5) {
       let coloredProperties = this.gameState.tiles.filter(x => x.type === 'ColorProperty');

@@ -102,11 +102,8 @@
         </div>
         <div class="row align-items-center justify-content-center">
           <div class="btn-group-vertical">
-            <button type="button" class="btn btn-lg btn-danger"
-              [ngClass]="!endTurnBtnEnabled ? 'disabled': 'done-btn active'" (click)="endTurn()">End Turn</button>
-            <button *ngIf="gamePlayer && 0 > gamePlayer.money" type="button" class="btn btn-lg btn-danger active"
-              [ngClass]="gameInProgress && gameState.currentPlayer.id !== this.gamePlayerId ? 'disabled': ''"
-              (click)="declareBankruptcy()">Bankruptcy</button>
+            <button type="button" class="btn btn-lg btn-danger" [ngClass]="!endTurnBtnEnabled ? 'disabled': 'done-btn active'" (click)="endTurn()">End Turn</button>
+            <button *ngIf="gamePlayer && 0 > gamePlayer.money" type="button" class="btn btn-lg btn-danger" [ngClass]="gameInProgress && gameState.currentPlayer.id !== this.gamePlayerId ? 'disabled': 'active'" (click)="declareBankruptcy()">Bankruptcy</button>
           </div>
         </div>
       </div>

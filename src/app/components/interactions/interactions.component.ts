@@ -81,9 +81,11 @@ export class InteractionsComponent implements OnInit {
   goSalaryNoti: string;
   goToJailNoti: string;
   paidNoti: string;
+  canClearEvents: boolean;
 
   //dev use
   loadInstantMono: boolean = false;
+
 
   constructor(private modalService: NgbModal, private interactionsService: InteractionsService) {
     this.lastDiceRoll = [2, 2];
@@ -91,6 +93,7 @@ export class InteractionsComponent implements OnInit {
     this.tradeMyPlayerSelectedProperties = [];
     this.offers = [];
     this.gameLog = [];
+    this.canClearEvents = true;
   }
 
   ngOnInit(): void {
@@ -107,7 +110,7 @@ export class InteractionsComponent implements OnInit {
     });
 
     this.interactionsService.rejectedTradeId().subscribe((rejectedTradeId) => {
-      var rejectedOffer = this.gameState.tradeOffers.find(x => x.id == rejectedTradeId);
+      let rejectedOffer = this.gameState.tradeOffers.find(x => x.id == rejectedTradeId);
       if (rejectedOffer) {
         this.acceptedOffer = undefined;
         this.rejectedOffer = rejectedOffer;
@@ -115,7 +118,7 @@ export class InteractionsComponent implements OnInit {
     });
 
     this.interactionsService.acceptedTradeId().subscribe((acceptedTradeId) => {
-      var acceptedOffer = this.gameState.tradeOffers.find(x => x.id == acceptedTradeId);
+      let acceptedOffer = this.gameState.tradeOffers.find(x => x.id == acceptedTradeId);
       if (acceptedOffer) {
         this.rejectedOffer = undefined;
         this.acceptedOffer = acceptedOffer;
@@ -168,12 +171,17 @@ export class InteractionsComponent implements OnInit {
         this.closeTradeOffersModal();
       }
       this.checkForAuctionWinnerNoti();
+
+      if (this.rollBtnEnabled && this.canClearEvents) {
+        this.clearGameEvents();
+        this.canClearEvents = false;
+      }
     });
   }
 
   private checkForNotifications(gameLog: string[]): void {
     if (this.gameState) {
-      for (let i = 0; i < gameLog.length && i < 3; i++) {
+      for (let i = 0; i < gameLog.length && i < 2; i++) {
         let gameLogEntry = gameLog[i];
         let playersFound = this.gameState.players.filter(p => gameLogEntry.includes(p.name));
 
@@ -238,9 +246,9 @@ export class InteractionsComponent implements OnInit {
   private checkForAuctionWinnerNoti(): void {
     if (this.prevGameState && this.gameState) {
       if (this.prevGameState.auction && !this.gameState.auction) {
-        var auctionedProperty = this.gameState.tiles.find(t => t.id == this.prevGameState.currentTile.id);
-        var auctionWinner = this.gameState.players.find(x => x.id == auctionedProperty.ownerPlayerID);
-        var auctionWinnerBetAmount = this.prevGameState.players.find(x => auctionWinner && x.id == auctionWinner.id).money - auctionWinner.money;
+        let auctionedProperty = this.gameState.tiles.find(t => t.id == this.prevGameState.currentTile.id);
+        let auctionWinner = this.gameState.players.find(x => x.id == auctionedProperty.ownerPlayerID);
+        let auctionWinnerBetAmount = this.prevGameState.players.find(x => auctionWinner && x.id == auctionWinner.id).money - auctionWinner.money;
         this.msgAuctionWinner = '<span class="Player-Background-' + auctionWinner.color + '">' + auctionWinner.name + '</span>' + " won the auction for " + auctionedProperty.name + " in the amount of $" + auctionWinnerBetAmount + "!";
       } else if (this.gameState.auction) {
         this.msgAuctionWinner = undefined;
@@ -287,18 +295,23 @@ export class InteractionsComponent implements OnInit {
   endTurn(): void {
     if (this.endTurnBtnEnabled) {
       this.interactionsService.endTurn().subscribe(() => {
-        this.rejectedOffer = undefined;
-        this.acceptedOffer = undefined;
-        this.msgAuctionWinner = undefined;
-        this.goToJailNoti = undefined;
-        this.goSalaryNoti = undefined;
-        this.paidNoti = undefined;
+        this.clearGameEvents();
+        this.canClearEvents = true;
       });
     }
   }
 
+  private clearGameEvents() {
+    this.rejectedOffer = undefined;
+    this.acceptedOffer = undefined;
+    this.msgAuctionWinner = undefined;
+    this.goToJailNoti = undefined;
+    this.goSalaryNoti = undefined;
+    this.paidNoti = undefined;
+  }
+
   declareBankruptcy(): void {
-    if (this.gamePlayer.money < 0) {
+    if (this.isPlayersTurn() && this.gamePlayer.money < 0) {
       this.interactionsService.declareBankruptcy().subscribe(() => {
       });
     }
