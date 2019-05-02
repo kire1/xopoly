@@ -9,7 +9,6 @@ import { Player } from 'src/app/models/game/Player';
 import { LobbyState } from 'src/app/models/lobby/LobbyState';
 import { TradeOffer } from 'src/app/models/game/TradeOffer';
 import { TileTypes } from '../board/board.component';
-import { connectableObservableDescriptor } from 'rxjs/internal/observable/ConnectableObservable';
 
 @Component({
   selector: 'interactions',
@@ -215,7 +214,7 @@ export class InteractionsComponent implements OnInit {
 
       for (let i = 0; i < gameLog.length; i++) {
         let gameLogEntry = gameLog[i];
-        let gameLogEntryTextArray = gameLog[i].replace(/'/g, "").split(" ");
+        let gameLogEntryTextArray = gameLogEntry.replace(/'/g, "").split(" ");
         let playersFound = players.filter(p => gameLogEntry.includes(p.name));
 
         for (let player of playersFound) {

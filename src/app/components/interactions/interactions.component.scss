@@ -47,7 +47,7 @@
     @media only screen and (max-width: 1366px) {
       .btn-lg {
         padding: 0.375rem 0.75rem;
-        font-size: 1rem;
+        font-size: 1.5vmin;
         line-height: 1.5;
         border-radius: 0.25rem;
       }
@@ -272,17 +272,18 @@
   }
 
   .game-events {
-    font-size: 1.4vmin;
+    font-size: 1.7vmin;
 
     .chance-comminuty {
       .card {
         .card-body {
           padding: 1vmin;
+
           .card-title {
             margin: 0;
-            font-size: 1.6vmin;
             margin-bottom: 0.7vmin;
           }
+          
           .card-text {
             margin: 0;
             margin-bottom: 0.7vmin;
@@ -311,7 +312,7 @@
       ul {
         overflow: auto;
         height: 20vmin;
-        font-size: 1vmin;
+        font-size: 1.5vmin;
       }
     }
 
