@@ -19,7 +19,7 @@
     margin-top: 1.5vmin;
 
     ::-webkit-scrollbar {
-      width: .5vmin;
+      width: 0.5vmin;
     }
 
     ::-webkit-scrollbar-track {
@@ -83,6 +83,11 @@
       svg {
         width: 5vmin;
         height: 5vmin;
+
+        path {
+          stroke-width: 1.3vmin;
+          stroke: gray;
+        }
       }
     }
 
@@ -177,6 +182,17 @@
 
     .card-body {
       padding: 0.5rem;
+
+      .name {
+        .drawing{
+          svg{
+            path {
+              stroke-width: 1.3vmin;
+              stroke: gray;
+            }
+          }
+        }
+      }
     }
 
     .name,

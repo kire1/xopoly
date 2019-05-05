@@ -160,6 +160,11 @@ export class InteractionsComponent implements OnInit {
         this.closePropertyAuctionModal();
       }
 
+      if(this.playerMoveInProgress){
+        this.closePropertyBuyModal();
+        this.closePropertyAuctionModal();
+      }
+
       //update trades properties if, trade is open and things change
       if (this.tradeInProgress && this.tradeTargetPlayer) {
         let newTradeTargetPlayerAllProperties = this.getOwnedPropertiesForTrade(this.tradeTargetPlayer.id);
@@ -298,6 +303,11 @@ export class InteractionsComponent implements OnInit {
 
   rollDice(): void {
     if (this.rollBtnEnabled) {
+      this.acceptedOffer = undefined;
+      this.rejectedOffer = undefined;
+      this.goToJailNoti = undefined;
+      this.goSalaryNoti = undefined;
+      this.paidNoti = undefined;
       this.interactionsService.rollDice().subscribe(() => {
       });
     }
