@@ -2,13 +2,12 @@
 	<div *ngIf="gameState" class="game-ui">
 		<div class="board">
 			<div class="center">
-				<interactions (startPropertySelection)="startViewPropertySelection($event)"></interactions>
+				<interactions (startPropertySelection)="startViewPropertySelection($event)" [playerMoveInProgress]="playerMoveInProgress"></interactions>
 			</div>
 
 			<div class="space corner go" id="0" [ngClass]="getTileClasses(0)">
 				<div class="container">
-					<span *ngFor="let player of gameState.players; let i = index"
-						[ngClass]="0 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					<span *ngFor="let player of playersToMove; let i = index" [ngClass]="0 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 					<div class="instructions">Collect $200.00 salary as you pass</div>
 					<div class="go-word">go</div>
 					<fa-icon class="drawing arrow-drawing" [icon]="faLongArrowAltLeft"></fa-icon>
@@ -16,7 +15,7 @@
 			</div>
 
 			<div class="row horizontal-row bottom-row">
-				<div class="space" *ngFor="let tile of gameState.tiles.slice(1,10).reverse()" id="{{tile.id}}"
+				<div class="space" *ngFor="let tile of propertiesBottomRow" id="{{tile.id}}"
 					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
 					<div class="container">
 						<fa-icon *ngIf="tile.isMortgaged"
@@ -33,8 +32,7 @@
 							</div>
 						</div>
 						<div class="info">
-							<span *ngFor="let player of gameState.players; let i = index"
-								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<span *ngFor="let player of playersToMove; let i = index" [ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 							<div class="name">{{ tile.name }}</div>
 							<fa-icon *ngIf="tile.type == 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
 							<fa-icon *ngIf="tile.type == 'Railroad'" class="drawing railroad-drawing" [icon]="faSubway">
@@ -59,8 +57,8 @@
 							<i class="person fa fa-frown-o"></i>
 						</div>
 						<div class="name">Jail</div>
-						<span *ngFor="let player of gameState.players; let i = index" [ngClass]="(10 === player.boardPosition) && !player.isInJail ? 'game-piece-visiting' + ' player-visiting-' + i + ' Player-Background-' + player.color : ''"></span>
-						<span *ngFor="let player of gameState.players; let i = index" [ngClass]="(10 === player.boardPosition) && player.isInJail ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+						<span *ngFor="let player of playersToMove; let i = index" [ngClass]="(10 === player.boardPosition) && !player.isInJail ? 'game-piece-visiting' + ' player-visiting-' + i + ' Player-Background-' + player.color : ''"></span>
+						<span *ngFor="let player of playersToMove; let i = index" [ngClass]="(10 === player.boardPosition) && player.isInJail ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 					</div>
 				</div>
 				<div class="visiting">
@@ -69,7 +67,7 @@
 			</div>
 
 			<div class="row vertical-row left-row">
-				<div class="space" *ngFor="let tile of gameState.tiles.slice(11,20).reverse()" id="{{tile.id}}"
+				<div class="space" *ngFor="let tile of propertiesLeftRow" id="{{tile.id}}"
 					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
 					<div class="container">
 						<fa-icon *ngIf="tile.isMortgaged"
@@ -86,8 +84,7 @@
 							</div>
 						</div>
 						<div class="info">
-							<span *ngFor="let player of gameState.players; let i = index"
-								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<span *ngFor="let player of playersToMove; let i = index" [ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 							<div class="name">{{ tile.name }}</div>
 							<fa-icon *ngIf="tile.type == 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
 							<fa-icon *ngIf="tile.type == 'Railroad'" class="drawing railroad-drawing" [icon]="faSubway">
@@ -104,8 +101,7 @@
 
 			<div class="space corner free-parking" id="20" [ngClass]="getTileClasses(20)">
 				<div class="container">
-					<span *ngFor="let player of gameState.players; let i = index"
-						[ngClass]="20 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					<span *ngFor="let player of playersToMove; let i = index" [ngClass]="20 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 					<div class="name">Free</div>
 					<fa-icon class="drawing" [icon]="faCar"></fa-icon>
 					<div class="name">Parking</div>
@@ -113,7 +109,7 @@
 			</div>
 
 			<div class="row horizontal-row top-row">
-				<div class="space" *ngFor="let tile of gameState.tiles.slice(21,30)" id="{{tile.id}}"
+				<div class="space" *ngFor="let tile of propertiesTopRow" id="{{tile.id}}"
 					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
 					<div class="container">
 						<fa-icon *ngIf="tile.isMortgaged"
@@ -130,8 +126,7 @@
 							</div>
 						</div>
 						<div class="info">
-							<span *ngFor="let player of gameState.players; let i = index"
-								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<span *ngFor="let player of playersToMove; let i = index" [ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 							<div class="name">{{ tile.name }}</div>
 							<fa-icon *ngIf="tile.type == 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
 							<fa-icon *ngIf="tile.type == 'Railroad'" class="drawing railroad-drawing" [icon]="faSubway">
@@ -148,8 +143,7 @@
 
 			<div class="space corner go-to-jail" id="30" [ngClass]="getTileClasses(30)">
 				<div class="container">
-					<span *ngFor="let player of gameState.players; let i = index"
-						[ngClass]="30 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+					<span *ngFor="let player of playersToMove; let i = index" [ngClass]="30 === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 					<div class="name">Go To</div>
 					<fa-icon class="drawing" [icon]="faGavel"></fa-icon>
 					<div class="name">Jail</div>
@@ -157,7 +151,7 @@
 			</div>
 
 			<div class="row vertical-row right-row">
-				<div class="space" *ngFor="let tile of gameState.tiles.slice(31,40)" id="{{tile.id}}"
+				<div class="space" *ngFor="let tile of propertiesRightRow" id="{{tile.id}}"
 					[ngClass]="getTileClasses(tile.id)" (click)="handlePropertyClick(tile)">
 					<div class="container">
 						<fa-icon *ngIf="tile.isMortgaged" class="drawing"
@@ -174,8 +168,7 @@
 							</div>
 						</div>
 						<div class="info">
-							<span *ngFor="let player of gameState.players; let i = index"
-								[ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
+							<span *ngFor="let player of playersToMove; let i = index" [ngClass]="tile.id === player.boardPosition ? 'game-piece' + ' player-' + i + ' Player-Background-' + player.color : ''"></span>
 							<div class="name">{{ tile.name }}</div>
 							<fa-icon *ngIf="tile.type === 'Chance'" class="drawing" [icon]="faQuestion"></fa-icon>
 							<fa-icon *ngIf="tile.type === 'Railroad'" class="drawing railroad-drawing"

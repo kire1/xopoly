@@ -9,6 +9,7 @@ import { Player } from 'src/app/models/game/Player';
 import { LobbyState } from 'src/app/models/lobby/LobbyState';
 import { TradeOffer } from 'src/app/models/game/TradeOffer';
 import { TileTypes } from '../board/board.component';
+import { PlayerMoney } from 'src/app/models/game/PlayerMoney';
 
 @Component({
   selector: 'interactions',
@@ -21,6 +22,7 @@ export class InteractionsComponent implements OnInit {
   @ViewChild('propertyAuctionModalContent') propertyAuctionModalContent: ElementRef;
 
   @Output() startPropertySelection = new EventEmitter<string>();
+  @Input() playerMoveInProgress: boolean;
 
   nonPropertyIds = [0, 2, 4, 7, 10, 17, 20, 22, 30, 33, 36, 38];
   twoMonoPropertyIds = [1, 3, 37, 39];
@@ -77,15 +79,14 @@ export class InteractionsComponent implements OnInit {
   canAfford: boolean;
   gameLog: string[];
   msgAuctionWinner: string;
-  waitingToOpen: boolean;
   goSalaryNoti: string;
   goToJailNoti: string;
   paidNoti: string;
   canClearEvents: boolean;
+  playersMoney: PlayerMoney[];
 
   //dev use
   loadInstantMono: boolean = false;
-
 
   constructor(private modalService: NgbModal, private interactionsService: InteractionsService) {
     this.lastDiceRoll = [2, 2];
@@ -103,10 +104,12 @@ export class InteractionsComponent implements OnInit {
 
   private initNewGameState() {
     this.interactionsService.gameLogEntry().subscribe((gameLog) => {
-      let newGameLog = this.colorPlayersNames(gameLog);
-      this.gameLog = newGameLog;
-      this.checkForNotifications(newGameLog);
-
+      if (!this.playerMoveInProgress) {
+        //console.log("gameLog - playerMoveInProgress", this.playerMoveInProgress);
+        let newGameLog = this.colorPlayersNames(gameLog);
+        this.gameLog = newGameLog;
+        this.checkForNotifications(newGameLog);
+      }
     });
 
     this.interactionsService.rejectedTradeId().subscribe((rejectedTradeId) => {
@@ -126,32 +129,37 @@ export class InteractionsComponent implements OnInit {
     });
 
     this.interactionsService.newGameState().subscribe((newGameState) => {
-      console.log("interactions - gameState - ", newGameState);
+      //console.log("interactions - gameState - ", newGameState);
+      //console.log("newGameState - playerMoveInProgress", this.playerMoveInProgress);
       this.prevGameState = this.gameState;
       this.gameState = newGameState;
       this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId; });
       this.gameInProgress = newGameState ? true : false;
+
+      this.initPlayersMoney();
+      this.updatePlayersMoney(newGameState);
+      this.updateStates();
+
       if (this.loadInstantMono && this.isPlayersTurn()) {
         this.instantMono();
         this.loadInstantMono = false;
       }
-      this.updateStates();
+
       //u land on a propery
-      if (this.canOpenBuyPropertyModal() && !this.propertyBuyModalRef && !this.waitingToOpen) {
-        this.waitingToOpen = true;
-        this.interactionsService.newGameStateForOpenProp().subscribe((newGameState) => {
-          this.openPropertyBuyModal();
-          this.waitingToOpen = false;
-        });
+      if (this.canOpenBuyPropertyModal() && !this.propertyBuyModalRef && !this.playerMoveInProgress) {
+        this.openPropertyBuyModal();
       }
+
       //someone else auctioned a property
-      if (this.canBetOnAuction() && !this.propertyAuctionModalRef && !this.waitingToOpen) {
+      if (this.canBetOnAuction() && !this.propertyAuctionModalRef && !this.playerMoveInProgress) {
         this.closePropertyBuyModal();
         this.openPropertyAuctionModal();
       }
+
       if (!this.gameState.auctionInProgress || !this.canBetOnAuction()) {
         this.closePropertyAuctionModal();
       }
+
       //update trades properties if, trade is open and things change
       if (this.tradeInProgress && this.tradeTargetPlayer) {
         let newTradeTargetPlayerAllProperties = this.getOwnedPropertiesForTrade(this.tradeTargetPlayer.id);
@@ -177,6 +185,23 @@ export class InteractionsComponent implements OnInit {
         this.canClearEvents = false;
       }
     });
+  }
+
+  private initPlayersMoney() {
+    if (!this.playersMoney) {
+      this.playersMoney = [];
+      for (let player of this.gameState.players) {
+        this.playersMoney.push(new PlayerMoney(player.id, player.money));
+      }
+    }
+  }
+
+  private updatePlayersMoney(gameState: GameState) {
+    if (!this.playerMoveInProgress) {
+      for (let player of gameState.players) {
+        this.playersMoney.find(p => p.id === player.id).money = player.money;
+      }
+    }
   }
 
   private checkForNotifications(gameLog: string[]): void {
@@ -311,7 +336,7 @@ export class InteractionsComponent implements OnInit {
   }
 
   declareBankruptcy(): void {
-    if (this.isPlayersTurn() && this.gamePlayer.money < 0) {
+    if (this.isPlayersTurn() && this.gamePlayer.money < 0 && !this.playerMoveInProgress) {
       this.interactionsService.declareBankruptcy().subscribe(() => {
       });
     }
@@ -390,6 +415,10 @@ export class InteractionsComponent implements OnInit {
       color = 'red-money';
     }
     return color;
+  }
+
+  getMoney(playerId: string): number {
+      return this.playersMoney.find(p => p.id === playerId).money;
   }
 
   openTradeModal(content: any): void {
@@ -642,21 +671,21 @@ export class InteractionsComponent implements OnInit {
   private canViewOffers(): void {
     this.viewOffersBtnEnabled =
       this.gameState.tradeOffers.length > 0 &&
-      this.offers.length > 0
+      this.offers.length > 0  && !this.playerMoveInProgress;
   }
 
   private canTrade(): void {
     let otherPlayers = this.getOtherPlayers();
     this.tradeBtnEnabled = this.gamePlayer &&
       this.gamePlayer.money > 0 &&
-      otherPlayers && otherPlayers.length > 0
+      otherPlayers && otherPlayers.length > 0;
   }
 
   private canBuild(): void {
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
     let canBuild = false;
 
-    if (this.isPlayersTurn() && ownedProperties.length > 1) {
+    if (this.isPlayersTurn() && !this.playerMoveInProgress && ownedProperties.length > 1) {
       let coloredProperties = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
       coloredProperties = _.groupBy(coloredProperties, 'color');
       canBuild = Object.keys(coloredProperties).some(key =>
@@ -672,7 +701,7 @@ export class InteractionsComponent implements OnInit {
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
     let canSell = false;
 
-    if (this.isPlayersTurn() && ownedProperties.length > 1) {
+    if (this.isPlayersTurn() && !this.playerMoveInProgress && ownedProperties.length > 1) {
       let coloredProperties = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
       coloredProperties = _.groupBy(coloredProperties, 'color');
       canSell = Object.keys(coloredProperties).some(key =>
@@ -690,7 +719,7 @@ export class InteractionsComponent implements OnInit {
     canMortgage = this.isPlayersTurn() &&
       ownedProperties.length > 0 &&
       ownedProperties.some(x => !x.isMortgaged) &&
-      !this.gameState.auctionInProgress;
+      !this.gameState.auctionInProgress && !this.playerMoveInProgress;
 
     if (canMortgage) {
       let coloredPropertyGroups = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
@@ -710,7 +739,8 @@ export class InteractionsComponent implements OnInit {
   private canRedeem(): void {
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
 
-    this.redeemBtnEnabled = (this.isPlayersTurn() &&
+    this.redeemBtnEnabled = (this.isPlayersTurn()  && 
+    !this.playerMoveInProgress &&
       ownedProperties.length > 0 &&
       (ownedProperties.some(x => x.isMortgaged)));
   }
@@ -718,13 +748,13 @@ export class InteractionsComponent implements OnInit {
   private canPayJailFee(): void {
     this.payJailFeeBtnEnabled = this.isPlayersTurn() &&
       this.gameState.currentPlayer.isInJail
-      && !this.gameState.currentPlayer.currentDiceRoll;
+      && !this.gameState.currentPlayer.currentDiceRoll && !this.playerMoveInProgress;
   }
 
   private canGetOutOfJailFree(): void {
     this.getOutOfJailFreeBtnEnabled = this.isPlayersTurn() &&
       this.gameState.currentPlayer.isInJail &&
-      this.gameState.currentPlayer.hasGetOutOfJailFreeCard;
+      this.gameState.currentPlayer.hasGetOutOfJailFreeCard && !this.playerMoveInProgress;
   }
 
   private canRollDice(): void {
@@ -732,7 +762,7 @@ export class InteractionsComponent implements OnInit {
       !this.gameState.waitForBuyOrAuctionStart &&
       this.gameState.currentPlayer.money >= 0 &&
       (!this.gameState.currentPlayer.currentDiceRoll || (this.gameState.currentPlayer.currentDiceRoll.isDouble && !this.gameState.currentPlayer.isInJail)) &&
-      !this.gameState.auctionInProgress;
+      !this.gameState.auctionInProgress && !this.playerMoveInProgress;
   }
 
   private canEndTurn(): void {
@@ -741,7 +771,8 @@ export class InteractionsComponent implements OnInit {
       curPlayer.currentDiceRoll &&
       (!curPlayer.currentDiceRoll.isDouble || curPlayer.isInJail) &&
       !this.gameState.auctionInProgress &&
-      !this.gameState.waitForBuyOrAuctionStart;
+      !this.gameState.waitForBuyOrAuctionStart  && 
+      !this.playerMoveInProgress;
   }
 
   private canOpenBuyPropertyModal(): boolean {

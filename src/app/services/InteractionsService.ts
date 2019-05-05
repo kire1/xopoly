@@ -86,10 +86,6 @@ export class InteractionsService implements OnInit {
     return this.gameEngine.gameState$.pipe(skip(1));
   }
 
-  newGameStateForOpenProp(): Observable<any> {
-    return this.gameEngine.gameState$.pipe(take(1), delay(800));
-  }
-
   newLobbyState(): Observable<any> {
     return this.gameEngine.lobbyState$.pipe(skip(1));
   }

@@ -53,9 +53,15 @@ export class BoardComponent implements OnInit {
   gameState: GameState;
   lobbyState: LobbyState;
   gamePlayer: Player;
+  playersToMove: Player[];
   propertySelectionType: string;
+  propertiesTopRow: any[];
+  propertiesBottomRow: any[];
+  propertiesLeftRow: any[];
+  propertiesRightRow: any[];
 
   updateGameState = true;
+  playerMoveInProgress: boolean = false;
 
   constructor(private modalService: NgbModal, private interactionsService: InteractionsService) {
   }
@@ -67,7 +73,7 @@ export class BoardComponent implements OnInit {
       this.gamePlayerId = newLobbyState.player.gameID;
 
       let lobby = newLobbyState.lobbies.find((l) => {
-        return l.players.find((p) => { 
+        return l.players.find((p) => {
           return p.computerUserID === newLobbyState.player.computerUserID;
         }) != undefined;
       });
@@ -78,8 +84,26 @@ export class BoardComponent implements OnInit {
     });
 
     this.interactionsService.newGameState().subscribe((newGameState) => {
-        this.gameState = newGameState;
-        this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId });
+      this.gameState = newGameState;
+      this.gamePlayer = newGameState.players.find(p => p.id === this.gamePlayerId);
+      
+      this.movePlayers();
+
+      if (!this.propertiesTopRow) {
+        this.propertiesTopRow = this.gameState.tiles.slice(21, 30);
+      }
+
+      if (!this.propertiesBottomRow) {
+        this.propertiesBottomRow = this.gameState.tiles.slice(1, 10).reverse();
+      }
+
+      if (!this.propertiesLeftRow) {
+        this.propertiesLeftRow = this.gameState.tiles.slice(11, 20).reverse();
+      }
+
+      if (!this.propertiesRightRow) {
+        this.propertiesRightRow = this.gameState.tiles.slice(31, 40);
+      }
     });
   }
 
@@ -88,6 +112,7 @@ export class BoardComponent implements OnInit {
     let tileClass = "";
 
     if (property) {
+      this.updateMyProperty(property);
 
       if (property.ownerPlayerID) {
         tileClass += " Player-Background-" +
@@ -127,6 +152,92 @@ export class BoardComponent implements OnInit {
     }
 
     return tileClass;
+  }
+
+  movePlayers(): void {
+    if(!this.playersToMove){
+      this.playersToMove = this.gameState.players;
+    }
+
+    let currentGamePlayer = this.gameState.currentPlayer;
+    let myGamePlayer = this.playersToMove.find(p => p.id == currentGamePlayer.id);
+
+    if (myGamePlayer.boardPosition !== currentGamePlayer.boardPosition && !this.playerMoveInProgress) {
+      this.playerMoveInProgress = true;
+      //moveMyPlayer
+      let targetPos = currentGamePlayer.boardPosition; //30
+      let currentPos = myGamePlayer.boardPosition; //25
+
+      (async () => {
+        while (currentPos != targetPos) {
+          currentPos++;
+          if (currentPos === 40) {
+            currentPos = 0;
+          }
+          //lands on go to jail
+          if(currentGamePlayer.isInJail){
+            currentPos = 10;
+            targetPos = 10;
+            this.playersToMove.find(p => p.id === currentGamePlayer.id).boardPosition = targetPos;
+          }
+          else{
+            this.playersToMove.find(p => p.id === currentGamePlayer.id).boardPosition = currentPos;
+          }
+          await this.delay(275);
+        }
+        //updateMyplayer
+        let index = this.playersToMove.findIndex(p => p.id === currentGamePlayer.id);
+        if (index >= 0) {
+          this.playersToMove[index] = currentGamePlayer;
+        }
+        this.playerMoveInProgress = false;
+      })();
+    }
+  }
+
+
+  private delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  updateMyProperty(property: any) {
+    if (property) {
+      if (this.propertiesTopRow.some(p => p.id === property.id)) {
+        let index = this.propertiesTopRow.findIndex(p => p.id === property.id);
+        let myProperty = this.propertiesTopRow.find(p => p.id === property.id);
+        if (!(_.isEqual(myProperty, property)) && index >= 0) {
+          this.propertiesTopRow[index] = property;
+          console.log("Update propertiesTopRow: " + property.name, index);
+        }
+      }
+
+      if (this.propertiesBottomRow.some(p => p.id === property.id)) {
+        let index = this.propertiesBottomRow.findIndex(p => p.id === property.id);
+        let myProperty = this.propertiesBottomRow.find(p => p.id === property.id);
+        if (!(_.isEqual(myProperty, property)) && index >= 0) {
+          this.propertiesBottomRow[index] = property;
+          console.log("Update propertiesBottomRow: " + property.name, index);
+        }
+      }
+
+      if (this.propertiesLeftRow.some(p => p.id === property.id)) {
+        let index = this.propertiesLeftRow.findIndex(p => p.id === property.id);
+        let myProperty = this.propertiesLeftRow.find(p => p.id === property.id);
+        if (!(_.isEqual(myProperty, property)) && index >= 0) {
+          this.propertiesLeftRow[index] = property;
+          console.log("Update propertiesLeftRow: " + property.name, index);
+        }
+      }
+
+      if (this.propertiesRightRow.some(p => p.id === property.id)) {
+        let index = this.propertiesRightRow.findIndex(p => p.id === property.id);
+        let myProperty = this.propertiesRightRow.find(p => p.id === property.id);
+        if (!(_.isEqual(myProperty, property)) && index >= 0) {
+          this.propertiesRightRow[index] = property;
+          console.log("Update propertiesRightRow: " + property.name, index);
+        }
+      }
+    }
   }
 
   handlePropertyClick(property: any): void {
@@ -193,7 +304,7 @@ export class BoardComponent implements OnInit {
       this.propertySelectionType = TileTypes.BuildHouse;
     } else if (type === TileTypes.SellHouse) {
       this.propertySelectionType = TileTypes.SellHouse;
-    }else if (type === TileTypes.None){
+    } else if (type === TileTypes.None) {
       this.propertySelectionType = undefined;
     }
   }
