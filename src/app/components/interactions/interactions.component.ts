@@ -107,7 +107,6 @@ export class InteractionsComponent implements OnInit {
     this.interactionsService.gameLogEntry().subscribe((gameLog) => {
       let newGameLog = this.colorPlayersNames(gameLog);
       if (!this.playerMoveInProgress) {
-        //console.log("gameLog - playerMoveInProgress", this.playerMoveInProgress);
         this.gameLog = newGameLog;
         this.checkForNotifications(newGameLog);
 

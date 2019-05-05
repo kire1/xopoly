@@ -64,7 +64,7 @@
     <div class="col trade-events info">
       <div class="card">
         <div class="card-header title">Information</div>
-        <div class="card-body" *ngIf="acceptedOffer || rejectedOffer || goSalaryNoti || goToJailNoti || paidNoti || rollNoti">
+        <div class="card-body">
           <p *ngIf="rejectedOffer" class="card-title"><span [ngClass]="'Player-Background-' + rejectedOffer.playerB.color">{{rejectedOffer.playerB.name}}</span> rejected your offer.</p>
           <p *ngIf="acceptedOffer" class="card-title"><span [ngClass]="'Player-Background-' + acceptedOffer.playerB.color">{{acceptedOffer.playerB.name}}</span> accepted your offer.</p>
           <p *ngIf="goSalaryNoti" class="card-title" [innerHTML]="goSalaryNoti"></p>
