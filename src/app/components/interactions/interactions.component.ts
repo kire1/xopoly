@@ -82,6 +82,7 @@ export class InteractionsComponent implements OnInit {
   goSalaryNoti: string;
   goToJailNoti: string;
   paidNoti: string;
+  rollNoti: string;
   canClearEvents: boolean;
   playersMoney: PlayerMoney[];
 
@@ -104,12 +105,14 @@ export class InteractionsComponent implements OnInit {
 
   private initNewGameState() {
     this.interactionsService.gameLogEntry().subscribe((gameLog) => {
+      let newGameLog = this.colorPlayersNames(gameLog);
       if (!this.playerMoveInProgress) {
         //console.log("gameLog - playerMoveInProgress", this.playerMoveInProgress);
-        let newGameLog = this.colorPlayersNames(gameLog);
         this.gameLog = newGameLog;
         this.checkForNotifications(newGameLog);
+
       }
+      this.checkForRollNoti(newGameLog);
     });
 
     this.interactionsService.rejectedTradeId().subscribe((rejectedTradeId) => {
@@ -160,7 +163,7 @@ export class InteractionsComponent implements OnInit {
         this.closePropertyAuctionModal();
       }
 
-      if(this.playerMoveInProgress){
+      if (this.playerMoveInProgress) {
         this.closePropertyBuyModal();
         this.closePropertyAuctionModal();
       }
@@ -190,6 +193,38 @@ export class InteractionsComponent implements OnInit {
         this.canClearEvents = false;
       }
     });
+  }
+
+  private checkForRollNoti(gameLog: string[]): void {
+    if (this.gameState) {
+      for (let i = 0; i < gameLog.length && i < 2; i++) {
+        let gameLogEntry = gameLog[i];
+        let playersFound = this.gameState.players.filter(p => gameLogEntry.includes(p.name));
+        let rollNotiFound = gameLogEntry.includes("rolled");
+        let startIndex = gameLogEntry.lastIndexOf(":") + 1;
+
+        if (playersFound.length > 0) {
+          startIndex = gameLogEntry.indexOf("<");
+        }
+
+        let firstDiceStartIndex = gameLogEntry.indexOf("[");
+        let secondDiceStartIndex = gameLogEntry.lastIndexOf("[");
+
+        let dice1Val= +gameLogEntry.substr(firstDiceStartIndex + 1, 1);
+        let dice2Val =  +gameLogEntry.substr(secondDiceStartIndex + 1, 1);
+
+        if (rollNotiFound) {
+          this.acceptedOffer = undefined;
+          this.rejectedOffer = undefined;
+          this.goToJailNoti = undefined;
+          this.goSalaryNoti = undefined;
+          this.paidNoti = undefined;
+          this.rollNoti = gameLogEntry.substring(startIndex).replace("[" + dice1Val + "],[" + dice2Val + "]", (dice1Val + dice2Val) + "");
+        }else{
+          this.rollNoti = undefined;
+        }
+      }
+    }
   }
 
   private initPlayersMoney() {
@@ -428,7 +463,7 @@ export class InteractionsComponent implements OnInit {
   }
 
   getMoney(playerId: string): number {
-      return this.playersMoney.find(p => p.id === playerId).money;
+    return this.playersMoney.find(p => p.id === playerId).money;
   }
 
   openTradeModal(content: any): void {
@@ -681,7 +716,7 @@ export class InteractionsComponent implements OnInit {
   private canViewOffers(): void {
     this.viewOffersBtnEnabled =
       this.gameState.tradeOffers.length > 0 &&
-      this.offers.length > 0  && !this.playerMoveInProgress;
+      this.offers.length > 0 && !this.playerMoveInProgress;
   }
 
   private canTrade(): void {
@@ -749,8 +784,8 @@ export class InteractionsComponent implements OnInit {
   private canRedeem(): void {
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
 
-    this.redeemBtnEnabled = (this.isPlayersTurn()  && 
-    !this.playerMoveInProgress &&
+    this.redeemBtnEnabled = (this.isPlayersTurn() &&
+      !this.playerMoveInProgress &&
       ownedProperties.length > 0 &&
       (ownedProperties.some(x => x.isMortgaged)));
   }
@@ -781,7 +816,7 @@ export class InteractionsComponent implements OnInit {
       curPlayer.currentDiceRoll &&
       (!curPlayer.currentDiceRoll.isDouble || curPlayer.isInJail) &&
       !this.gameState.auctionInProgress &&
-      !this.gameState.waitForBuyOrAuctionStart  && 
+      !this.gameState.waitForBuyOrAuctionStart &&
       !this.playerMoveInProgress;
   }
 
