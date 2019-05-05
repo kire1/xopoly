@@ -83,7 +83,6 @@ export class InteractionsComponent implements OnInit {
   goToJailNoti: string;
   paidNoti: string;
   rollNoti: string;
-  canClearEvents: boolean;
   playersMoney: PlayerMoney[];
 
   //dev use
@@ -95,7 +94,6 @@ export class InteractionsComponent implements OnInit {
     this.tradeMyPlayerSelectedProperties = [];
     this.offers = [];
     this.gameLog = [];
-    this.canClearEvents = true;
   }
 
   ngOnInit(): void {
@@ -103,245 +101,9 @@ export class InteractionsComponent implements OnInit {
     this.initNewGameState();
   }
 
-  private initNewGameState() {
-    this.interactionsService.gameLogEntry().subscribe((gameLog) => {
-      let newGameLog = this.colorPlayersNames(gameLog);
-      if (!this.playerMoveInProgress) {
-        this.gameLog = newGameLog;
-        this.checkForNotifications(newGameLog);
-
-      }
-      this.checkForRollNoti(newGameLog);
-    });
-
-    this.interactionsService.rejectedTradeId().subscribe((rejectedTradeId) => {
-      let rejectedOffer = this.gameState.tradeOffers.find(x => x.id == rejectedTradeId);
-      if (rejectedOffer) {
-        this.acceptedOffer = undefined;
-        this.rejectedOffer = rejectedOffer;
-      }
-    });
-
-    this.interactionsService.acceptedTradeId().subscribe((acceptedTradeId) => {
-      let acceptedOffer = this.gameState.tradeOffers.find(x => x.id == acceptedTradeId);
-      if (acceptedOffer) {
-        this.rejectedOffer = undefined;
-        this.acceptedOffer = acceptedOffer;
-      }
-    });
-
-    this.interactionsService.newGameState().subscribe((newGameState) => {
-      //console.log("interactions - gameState - ", newGameState);
-      //console.log("newGameState - playerMoveInProgress", this.playerMoveInProgress);
-      this.prevGameState = this.gameState;
-      this.gameState = newGameState;
-      this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId; });
-      this.gameInProgress = newGameState ? true : false;
-
-      this.initPlayersMoney();
-      this.updatePlayersMoney(newGameState);
-      this.updateStates();
-
-      if (this.loadInstantMono && this.isPlayersTurn()) {
-        this.instantMono();
-        this.loadInstantMono = false;
-      }
-
-      //u land on a propery
-      if (this.canOpenBuyPropertyModal() && !this.propertyBuyModalRef && !this.playerMoveInProgress) {
-        this.openPropertyBuyModal();
-      }
-
-      //someone else auctioned a property
-      if (this.canBetOnAuction() && !this.propertyAuctionModalRef && !this.playerMoveInProgress) {
-        this.closePropertyBuyModal();
-        this.openPropertyAuctionModal();
-      }
-
-      if (!this.gameState.auctionInProgress || !this.canBetOnAuction()) {
-        this.closePropertyAuctionModal();
-      }
-
-      if (this.playerMoveInProgress) {
-        this.closePropertyBuyModal();
-        this.closePropertyAuctionModal();
-      }
-
-      //update trades properties if, trade is open and things change
-      if (this.tradeInProgress && this.tradeTargetPlayer) {
-        let newTradeTargetPlayerAllProperties = this.getOwnedPropertiesForTrade(this.tradeTargetPlayer.id);
-        let newTradeMyPlayerAllProperties = this.getOwnedPropertiesForTrade(this.gamePlayerId);
-        if (this.compareById(this.tradeTargetPlayerAllProperties, newTradeTargetPlayerAllProperties)) {
-          this.tradeTargetPlayerAllProperties = newTradeTargetPlayerAllProperties;
-        }
-        if (this.compareById(this.tradeMyPlayerAllProperties, newTradeMyPlayerAllProperties)) {
-          this.tradeMyPlayerAllProperties = newTradeMyPlayerAllProperties;
-        }
-      }
-      //updates offers if offers modal is open and things change
-      if (this.gameState.tradeOffers && this.compareById(this.gameState.tradeOffers, this.offers)) {
-        this.offers = this.gameState.tradeOffers.filter(to => to.playerA.id === this.gamePlayerId || to.playerB.id === this.gamePlayerId);
-      }
-      if (this.gameState.tradeOffers.length === 0) {
-        this.closeTradeOffersModal();
-      }
-      this.checkForAuctionWinnerNoti();
-
-      if (this.rollBtnEnabled && this.canClearEvents) {
-        this.clearGameEvents();
-        this.canClearEvents = false;
-      }
-    });
-  }
-
-  private checkForRollNoti(gameLog: string[]): void {
-    if (this.gameState) {
-      for (let i = 0; i < gameLog.length && i < 2; i++) {
-        let gameLogEntry = gameLog[i];
-        let playersFound = this.gameState.players.filter(p => gameLogEntry.includes(p.name));
-        let rollNotiFound = gameLogEntry.includes("rolled");
-        let startIndex = gameLogEntry.lastIndexOf(":") + 1;
-
-        if (playersFound.length > 0) {
-          startIndex = gameLogEntry.indexOf("<");
-        }
-
-        let firstDiceStartIndex = gameLogEntry.indexOf("[");
-        let secondDiceStartIndex = gameLogEntry.lastIndexOf("[");
-
-        let dice1Val= +gameLogEntry.substr(firstDiceStartIndex + 1, 1);
-        let dice2Val =  +gameLogEntry.substr(secondDiceStartIndex + 1, 1);
-
-        if (rollNotiFound) {
-          this.acceptedOffer = undefined;
-          this.rejectedOffer = undefined;
-          this.goToJailNoti = undefined;
-          this.goSalaryNoti = undefined;
-          this.paidNoti = undefined;
-          this.rollNoti = gameLogEntry.substring(startIndex).replace("[" + dice1Val + "],[" + dice2Val + "]", (dice1Val + dice2Val) + "");
-        }else{
-          this.rollNoti = undefined;
-        }
-      }
-    }
-  }
-
-  private initPlayersMoney() {
-    if (!this.playersMoney) {
-      this.playersMoney = [];
-      for (let player of this.gameState.players) {
-        this.playersMoney.push(new PlayerMoney(player.id, player.money));
-      }
-    }
-  }
-
-  private updatePlayersMoney(gameState: GameState) {
-    if (!this.playerMoveInProgress) {
-      for (let player of gameState.players) {
-        this.playersMoney.find(p => p.id === player.id).money = player.money;
-      }
-    }
-  }
-
-  private checkForNotifications(gameLog: string[]): void {
-    if (this.gameState) {
-      for (let i = 0; i < gameLog.length && i < 2; i++) {
-        let gameLogEntry = gameLog[i];
-        let playersFound = this.gameState.players.filter(p => gameLogEntry.includes(p.name));
-
-        let goSalaryNotiFound = gameLogEntry.includes(" collected a salary of ");
-        let goToJailNotiFound = gameLogEntry.includes(" to jail");
-        let paidNotiFound = gameLogEntry.includes(" paid");
-
-        let startIndex = gameLogEntry.lastIndexOf(":") + 1;
-
-        if (playersFound.length > 0) {
-          startIndex = gameLogEntry.indexOf("<");
-        }
-
-        if (goSalaryNotiFound) {
-          this.goToJailNoti = undefined;
-          this.paidNoti = undefined;
-          this.goSalaryNoti = gameLogEntry.substring(startIndex);
-        }
-
-        if (goToJailNotiFound) {
-          this.goSalaryNoti = undefined;
-          this.paidNoti = undefined;
-          this.goToJailNoti = gameLogEntry.substring(startIndex);
-        }
-
-        if (paidNotiFound) {
-          this.goToJailNoti = undefined;
-          this.goSalaryNoti = undefined;
-          this.paidNoti = gameLog[i].substring(startIndex);
-        }
-      }
-    }
-  }
-
-  private colorPlayersNames(gameLog: string[]): string[] {
-    if (this.gameState) {
-      let players = this.gameState.players;
-
-      for (let i = 0; i < gameLog.length; i++) {
-        let gameLogEntry = gameLog[i];
-        let gameLogEntryTextArray = gameLogEntry.replace(/'/g, "").split(" ");
-        let playersFound = players.filter(p => gameLogEntry.includes(p.name));
-
-        for (let player of playersFound) {
-          //4/28/2019 5:04:56 PM: Player jki as aas landed on St. James Place!
-          let playerNameArray = player.name.split(" "); // ["jki","as","aas"]
-          let nameIndexStart = gameLogEntryTextArray.indexOf(playerNameArray[0]);
-          let htmlName = '<span class="Player-Background-' + player.color + '">' + player.name + '</span>';
-
-          // ['4/28/2019', '5:04:56 PM:', 'Player', 'jki', 'as', 'aas', 'landed', 'on', 'St.', 'James', 'Place!']
-          gameLogEntryTextArray.splice(nameIndexStart, playerNameArray.length, htmlName);
-          // ['<span class="Player-Background-Red">jki as aas</span>', 'landed', 'on', 'St.', 'James', 'Place!']
-        }
-
-        gameLog[i] = gameLogEntryTextArray.join(" ");
-      }
-    }
-
-    return gameLog;
-  }
-
-  private checkForAuctionWinnerNoti(): void {
-    if (this.prevGameState && this.gameState) {
-      if (this.prevGameState.auction && !this.gameState.auction) {
-        let auctionedProperty = this.gameState.tiles.find(t => t.id == this.prevGameState.currentTile.id);
-        let auctionWinner = this.gameState.players.find(x => x.id == auctionedProperty.ownerPlayerID);
-        let auctionWinnerBetAmount = this.prevGameState.players.find(x => auctionWinner && x.id == auctionWinner.id).money - auctionWinner.money;
-        this.msgAuctionWinner = '<span class="Player-Background-' + auctionWinner.color + '">' + auctionWinner.name + '</span>' + " won the auction for " + auctionedProperty.name + " in the amount of $" + auctionWinnerBetAmount + "!";
-      } else if (this.gameState.auction) {
-        this.msgAuctionWinner = undefined;
-      }
-    }
-  }
-
-  private initNewLobbyState() {
-    this.interactionsService.newLobbyState().subscribe((newLobbyState) => {
-      this.gamePlayerId = newLobbyState.player.gameID;
-      let lobby = newLobbyState.lobbies.find((l) => {
-        return l.players.find((p) => {
-          return p.computerUserID === newLobbyState.player.computerUserID;
-        }) != undefined;
-      });
-      if (!lobby) {
-        this.gameInProgress = false;
-      }
-    });
-    this.interactionsService.requestStateUpdate();
-  }
-
   rollDice(): void {
     if (this.rollBtnEnabled) {
-      this.acceptedOffer = undefined;
-      this.rejectedOffer = undefined;
-      this.goToJailNoti = undefined;
-      this.goSalaryNoti = undefined;
-      this.paidNoti = undefined;
+      this.clearGameEvents();
       this.interactionsService.rollDice().subscribe(() => {
       });
     }
@@ -365,18 +127,8 @@ export class InteractionsComponent implements OnInit {
     if (this.endTurnBtnEnabled) {
       this.interactionsService.endTurn().subscribe(() => {
         this.clearGameEvents();
-        this.canClearEvents = true;
       });
     }
-  }
-
-  private clearGameEvents() {
-    this.rejectedOffer = undefined;
-    this.acceptedOffer = undefined;
-    this.msgAuctionWinner = undefined;
-    this.goToJailNoti = undefined;
-    this.goSalaryNoti = undefined;
-    this.paidNoti = undefined;
   }
 
   declareBankruptcy(): void {
@@ -563,6 +315,244 @@ export class InteractionsComponent implements OnInit {
       this.interactionsService.sendTrade(this.tradeTargetPlayer.id, this.tradeMyPlayerSelectedProperties, this.tradeTargetPlayerSelectedProperties, this.tradeMyPlayerMoney, this.tradeTargetPlayerMoney).subscribe(() => {
         this.closeTradeModal();
       });
+    }
+  }
+
+  private initNewLobbyState() {
+    this.interactionsService.newLobbyState().subscribe((newLobbyState) => {
+      this.gamePlayerId = newLobbyState.player.gameID;
+      let lobby = newLobbyState.lobbies.find((l) => {
+        return l.players.find((p) => {
+          return p.computerUserID === newLobbyState.player.computerUserID;
+        }) != undefined;
+      });
+      if (!lobby) {
+        this.gameInProgress = false;
+      }
+    });
+    this.interactionsService.requestStateUpdate();
+  }
+
+  private initNewGameState() {
+    this.interactionsService.gameLogEntry().subscribe((gameLog) => {
+      let newGameLog = this.colorPlayersNames(gameLog);
+      if (!this.playerMoveInProgress) {
+        this.gameLog = newGameLog;
+        this.checkForNotifications(newGameLog);
+
+      }
+      this.checkForRollNoti(newGameLog);
+    });
+
+    this.interactionsService.rejectedTradeId().subscribe((rejectedTradeId) => {
+      let rejectedOffer = this.gameState.tradeOffers.find(x => x.id == rejectedTradeId);
+      if (rejectedOffer) {
+        this.acceptedOffer = undefined;
+        this.rejectedOffer = rejectedOffer;
+      }
+    });
+
+    this.interactionsService.acceptedTradeId().subscribe((acceptedTradeId) => {
+      let acceptedOffer = this.gameState.tradeOffers.find(x => x.id == acceptedTradeId);
+      if (acceptedOffer) {
+        this.rejectedOffer = undefined;
+        this.acceptedOffer = acceptedOffer;
+      }
+    });
+
+    this.interactionsService.newGameState().subscribe((newGameState) => {
+      //console.log("interactions - gameState - ", newGameState);
+      //console.log("newGameState - playerMoveInProgress", this.playerMoveInProgress);
+      this.prevGameState = this.gameState;
+      this.gameState = newGameState;
+      this.gamePlayer = newGameState.players.find((p) => { return p.id === this.gamePlayerId; });
+      this.gameInProgress = newGameState ? true : false;
+
+      this.initPlayersMoney();
+      this.updatePlayersMoney(newGameState);
+      this.updateStates();
+
+      if (this.loadInstantMono && this.isPlayersTurn()) {
+        this.instantMono();
+        this.loadInstantMono = false;
+      }
+
+      //u land on a propery
+      if (this.canOpenBuyPropertyModal() && !this.propertyBuyModalRef && !this.playerMoveInProgress) {
+        this.openPropertyBuyModal();
+      }
+
+      //someone else auctioned a property
+      if (this.canBetOnAuction() && !this.propertyAuctionModalRef && !this.playerMoveInProgress) {
+        this.closePropertyBuyModal();
+        this.openPropertyAuctionModal();
+      }
+
+      if (!this.gameState.auctionInProgress || !this.canBetOnAuction()) {
+        this.closePropertyAuctionModal();
+      }
+
+      if (this.playerMoveInProgress) {
+        this.closePropertyBuyModal();
+        this.closePropertyAuctionModal();
+      }
+
+      //update trades properties if, trade is open and things change
+      if (this.tradeInProgress && this.tradeTargetPlayer) {
+        let newTradeTargetPlayerAllProperties = this.getOwnedPropertiesForTrade(this.tradeTargetPlayer.id);
+        let newTradeMyPlayerAllProperties = this.getOwnedPropertiesForTrade(this.gamePlayerId);
+        if (this.compareById(this.tradeTargetPlayerAllProperties, newTradeTargetPlayerAllProperties)) {
+          this.tradeTargetPlayerAllProperties = newTradeTargetPlayerAllProperties;
+        }
+        if (this.compareById(this.tradeMyPlayerAllProperties, newTradeMyPlayerAllProperties)) {
+          this.tradeMyPlayerAllProperties = newTradeMyPlayerAllProperties;
+        }
+      }
+
+      //updates offers if offers modal is open and things change
+      if (this.gameState.tradeOffers && this.compareById(this.gameState.tradeOffers, this.offers)) {
+        this.offers = this.gameState.tradeOffers.filter(to => to.playerA.id === this.gamePlayerId || to.playerB.id === this.gamePlayerId);
+      }
+
+      if (this.gameState.tradeOffers.length === 0) {
+        this.closeTradeOffersModal();
+      }
+
+      this.checkForAuctionWinnerNoti();
+    });
+  }
+
+  private clearGameEvents() {
+    this.rejectedOffer = undefined;
+    this.acceptedOffer = undefined;
+    this.msgAuctionWinner = undefined;
+    this.goToJailNoti = undefined;
+    this.goSalaryNoti = undefined;
+    this.paidNoti = undefined;
+    this.rollNoti = undefined;
+  }
+
+  private checkForRollNoti(gameLog: string[]): void {
+    if (this.gameState) {
+      for (let i = 0; i < gameLog.length && i < 2; i++) {
+        let gameLogEntry = gameLog[i];
+        let playersFound = this.gameState.players.filter(p => gameLogEntry.includes(p.name));
+        let rollNotiFound = gameLogEntry.includes("rolled");
+        let startIndex = gameLogEntry.lastIndexOf(":") + 1;
+
+        if (playersFound.length > 0) {
+          startIndex = gameLogEntry.indexOf("<");
+        }
+
+        let firstDiceStartIndex = gameLogEntry.indexOf("[");
+        let secondDiceStartIndex = gameLogEntry.lastIndexOf("[");
+
+        let dice1Val= +gameLogEntry.substr(firstDiceStartIndex + 1, 1);
+        let dice2Val =  +gameLogEntry.substr(secondDiceStartIndex + 1, 1);
+
+        if (rollNotiFound) {
+          this.acceptedOffer = undefined;
+          this.rejectedOffer = undefined;
+          this.goToJailNoti = undefined;
+          this.goSalaryNoti = undefined;
+          this.paidNoti = undefined;
+          this.rollNoti = gameLogEntry.substring(startIndex).replace("[" + dice1Val + "],[" + dice2Val + "]", (dice1Val + dice2Val) + "");
+        }
+      }
+    }
+  }
+
+  private initPlayersMoney() {
+    if (!this.playersMoney) {
+      this.playersMoney = [];
+      for (let player of this.gameState.players) {
+        this.playersMoney.push(new PlayerMoney(player.id, player.money));
+      }
+    }
+  }
+
+  private updatePlayersMoney(gameState: GameState) {
+    if (!this.playerMoveInProgress) {
+      for (let player of gameState.players) {
+        this.playersMoney.find(p => p.id === player.id).money = player.money;
+      }
+    }
+  }
+
+  private checkForNotifications(gameLog: string[]): void {
+    if (this.gameState) {
+      for (let i = 0; i < gameLog.length && i < 2; i++) {
+        let gameLogEntry = gameLog[i];
+        let playersFound = this.gameState.players.filter(p => gameLogEntry.includes(p.name));
+
+        let goSalaryNotiFound = gameLogEntry.includes(" collected a salary of ");
+        let goToJailNotiFound = gameLogEntry.includes(" to jail");
+        let paidNotiFound = gameLogEntry.includes(" paid");
+
+        let startIndex = gameLogEntry.lastIndexOf(":") + 1;
+
+        if (playersFound.length > 0) {
+          startIndex = gameLogEntry.indexOf("<");
+        }
+
+        if (goSalaryNotiFound) {
+          this.goToJailNoti = undefined;
+          this.paidNoti = undefined;
+          this.goSalaryNoti = gameLogEntry.substring(startIndex);
+        }
+
+        if (goToJailNotiFound) {
+          this.goSalaryNoti = undefined;
+          this.paidNoti = undefined;
+          this.goToJailNoti = gameLogEntry.substring(startIndex);
+        }
+
+        if (paidNotiFound) {
+          this.goToJailNoti = undefined;
+          this.goSalaryNoti = undefined;
+          this.paidNoti = gameLog[i].substring(startIndex);
+        }
+      }
+    }
+  }
+
+  private colorPlayersNames(gameLog: string[]): string[] {
+    if (this.gameState) {
+      let players = this.gameState.players;
+
+      for (let i = 0; i < gameLog.length; i++) {
+        let gameLogEntry = gameLog[i];
+        let gameLogEntryTextArray = gameLogEntry.replace(/'/g, "").split(" ");
+        let playersFound = players.filter(p => gameLogEntry.includes(p.name));
+
+        for (let player of playersFound) {
+          //4/28/2019 5:04:56 PM: Player jki as aas landed on St. James Place!
+          let playerNameArray = player.name.split(" "); // ["jki","as","aas"]
+          let nameIndexStart = gameLogEntryTextArray.indexOf(playerNameArray[0]);
+          let htmlName = '<span class="Player-Background-' + player.color + '">' + player.name + '</span>';
+
+          // ['4/28/2019', '5:04:56 PM:', 'Player', 'jki', 'as', 'aas', 'landed', 'on', 'St.', 'James', 'Place!']
+          gameLogEntryTextArray.splice(nameIndexStart, playerNameArray.length, htmlName);
+          // ['<span class="Player-Background-Red">jki as aas</span>', 'landed', 'on', 'St.', 'James', 'Place!']
+        }
+
+        gameLog[i] = gameLogEntryTextArray.join(" ");
+      }
+    }
+
+    return gameLog;
+  }
+
+  private checkForAuctionWinnerNoti(): void {
+    if (this.prevGameState && this.gameState) {
+      if (this.prevGameState.auction && !this.gameState.auction) {
+        let auctionedProperty = this.gameState.tiles.find(t => t.id == this.prevGameState.currentTile.id);
+        let auctionWinner = this.gameState.players.find(x => x.id == auctionedProperty.ownerPlayerID);
+        let auctionWinnerBetAmount = this.prevGameState.players.find(x => auctionWinner && x.id == auctionWinner.id).money - auctionWinner.money;
+        this.msgAuctionWinner = '<span class="Player-Background-' + auctionWinner.color + '">' + auctionWinner.name + '</span>' + " won the auction for " + auctionedProperty.name + " in the amount of $" + auctionWinnerBetAmount + "!";
+      } else if (this.gameState.auction) {
+        this.msgAuctionWinner = undefined;
+      }
     }
   }
 
