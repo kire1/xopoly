@@ -799,7 +799,8 @@ export class InteractionsComponent implements OnInit {
   private canGetOutOfJailFree(): void {
     this.getOutOfJailFreeBtnEnabled = this.isPlayersTurn() &&
       this.gameState.currentPlayer.isInJail &&
-      this.gameState.currentPlayer.hasGetOutOfJailFreeCard && !this.playerMoveInProgress;
+      this.gameState.currentPlayer.hasGetOutOfJailFreeCard  && 
+      !this.gameState.currentPlayer.currentDiceRoll && !this.playerMoveInProgress;
   }
 
   private canRollDice(): void {
