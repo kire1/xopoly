@@ -19,7 +19,8 @@ export enum TileTypes {
   Chance = 'Chance',
   Railroad = 'Railroad',
   CommunityChest = 'CommunityChest',
-  None = "None"
+  None = "None",
+  Utility = "Utilities"
 }
 
 @Component({
@@ -86,8 +87,8 @@ export class BoardComponent implements OnInit {
     this.interactionsService.newGameState().subscribe((newGameState) => {
       this.gameState = newGameState;
       this.gamePlayer = newGameState.players.find(p => p.id === this.gamePlayerId);
-      
-      this.movePlayers();
+
+      this.movePlayers(newGameState);
 
       if (!this.propertiesTopRow) {
         this.propertiesTopRow = this.gameState.tiles.slice(21, 30);
@@ -144,7 +145,9 @@ export class BoardComponent implements OnInit {
         tileClass += " railroad";
       } else if (property.type === TileTypes.CommunityChest) {
         tileClass += " community-chest";
-      } else if (property.name === "Income Tax") {
+      } else if (property.type === TileTypes.Utility) {
+        tileClass += " utility";
+      }else if (property.name === "Income Tax") {
         tileClass += " fee income-tax";
       } else if (property.name === "Luxury Tax") {
         tileClass += " fee luxury-tax";
@@ -154,36 +157,65 @@ export class BoardComponent implements OnInit {
     return tileClass;
   }
 
-  movePlayers(): void {
-    if(!this.playersToMove){
-      this.playersToMove = this.gameState.players;
+  private movePlayers(gameState: GameState): void {
+    if (!this.playersToMove || this.playersToMove.length != gameState.players.length) {
+      this.playersToMove = gameState.players;
     }
 
-    let currentGamePlayer = this.gameState.currentPlayer;
+    let currentGamePlayer = gameState.currentPlayer;
     let myGamePlayer = this.playersToMove.find(p => p.id == currentGamePlayer.id);
 
     if (myGamePlayer.boardPosition !== currentGamePlayer.boardPosition && !this.playerMoveInProgress) {
       this.playerMoveInProgress = true;
-      //moveMyPlayer
-      let targetPos = currentGamePlayer.boardPosition; //30
-      let currentPos = myGamePlayer.boardPosition; //25
+      let timeMS = 250;
+      let targetPos = currentGamePlayer.boardPosition;
+      let currentPos = myGamePlayer.boardPosition;
+      let card = gameState.chanceDeck.currentPlayerCardText || gameState.communityChestDeck.currentPlayerCardText;
+      let moveBackwards = false;
+
+
+      if (card) {
+        if (card.includes("Advance") || card.includes("Take a trip to")) {
+          timeMS = 120;
+        } else if (card.includes("Go Back")) {
+          moveBackwards = true;
+        }
+
+        if (card.includes("nearest Utility.") && currentPos === 36) {
+          moveBackwards = true;
+        } else if (card.includes("nearest Railroad.") && (currentPos === 7 || currentPos === 36)) {
+          moveBackwards = true;
+        }
+      }
 
       (async () => {
         while (currentPos != targetPos) {
-          currentPos++;
-          if (currentPos === 40) {
-            currentPos = 0;
+
+          this.playerMoveInProgress = true;
+          // valid position 0-39
+          //    -1 | 0-39 | 40
+          if (moveBackwards) {
+            currentPos--;
+            if (currentPos < 0) {
+              currentPos = 39;
+            }
+          } else {
+            currentPos++;
+            if (currentPos > 39) {
+              currentPos = 0;
+            }
           }
+
           //lands on go to jail
-          if(currentGamePlayer.isInJail){
+          if (currentGamePlayer.isInJail) {
             currentPos = 10;
             targetPos = 10;
             this.playersToMove.find(p => p.id === currentGamePlayer.id).boardPosition = targetPos;
           }
-          else{
+          else {
             this.playersToMove.find(p => p.id === currentGamePlayer.id).boardPosition = currentPos;
           }
-          await this.delay(275);
+          await this.delay(timeMS);
         }
         //updateMyplayer
         let index = this.playersToMove.findIndex(p => p.id === currentGamePlayer.id);
@@ -207,7 +239,6 @@ export class BoardComponent implements OnInit {
         let myProperty = this.propertiesTopRow.find(p => p.id === property.id);
         if (!(_.isEqual(myProperty, property)) && index >= 0) {
           this.propertiesTopRow[index] = property;
-          console.log("Update propertiesTopRow: " + property.name, index);
         }
       }
 
@@ -216,7 +247,6 @@ export class BoardComponent implements OnInit {
         let myProperty = this.propertiesBottomRow.find(p => p.id === property.id);
         if (!(_.isEqual(myProperty, property)) && index >= 0) {
           this.propertiesBottomRow[index] = property;
-          console.log("Update propertiesBottomRow: " + property.name, index);
         }
       }
 
@@ -225,7 +255,6 @@ export class BoardComponent implements OnInit {
         let myProperty = this.propertiesLeftRow.find(p => p.id === property.id);
         if (!(_.isEqual(myProperty, property)) && index >= 0) {
           this.propertiesLeftRow[index] = property;
-          console.log("Update propertiesLeftRow: " + property.name, index);
         }
       }
 
@@ -234,7 +263,6 @@ export class BoardComponent implements OnInit {
         let myProperty = this.propertiesRightRow.find(p => p.id === property.id);
         if (!(_.isEqual(myProperty, property)) && index >= 0) {
           this.propertiesRightRow[index] = property;
-          console.log("Update propertiesRightRow: " + property.name, index);
         }
       }
     }

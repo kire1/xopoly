@@ -61,6 +61,7 @@ export class InteractionsComponent implements OnInit {
   getOutOfJailFreeBtnEnabled: boolean;
   gameInProgress: boolean;
   viewOffersBtnEnabled: boolean;
+  showCommChanceCard: boolean;
 
   tradeInProgress: boolean;
   tradeOffersInProgress: boolean;
@@ -318,6 +319,20 @@ export class InteractionsComponent implements OnInit {
     }
   }
 
+  shouldShowCommChanceCard() {
+    if(!this.playerMoveInProgress){
+      this.showCommChanceCard = false;
+    }
+    
+    let card = this.gameState.chanceDeck.currentPlayerCardText || this.gameState.communityChestDeck.currentPlayerCardText;
+    if (card) {
+      let specificCardTextFound = card.includes("Advance") || card.includes("Go Back") || card.includes("Take a trip to");
+      if (specificCardTextFound && !this.playerMoveInProgress) {
+        this.showCommChanceCard = true;
+      }
+    }
+  }
+
   private initNewLobbyState() {
     this.interactionsService.newLobbyState().subscribe((newLobbyState) => {
       this.gamePlayerId = newLobbyState.player.gameID;
@@ -419,6 +434,7 @@ export class InteractionsComponent implements OnInit {
       }
 
       this.checkForAuctionWinnerNoti();
+      this.shouldShowCommChanceCard();
     });
   }
 
@@ -548,8 +564,10 @@ export class InteractionsComponent implements OnInit {
       if (this.prevGameState.auction && !this.gameState.auction) {
         let auctionedProperty = this.gameState.tiles.find(t => t.id == this.prevGameState.currentTile.id);
         let auctionWinner = this.gameState.players.find(x => x.id == auctionedProperty.ownerPlayerID);
-        let auctionWinnerBetAmount = this.prevGameState.players.find(x => auctionWinner && x.id == auctionWinner.id).money - auctionWinner.money;
-        this.msgAuctionWinner = '<span class="Player-Background-' + auctionWinner.color + '">' + auctionWinner.name + '</span>' + " won the auction for " + auctionedProperty.name + " in the amount of $" + auctionWinnerBetAmount + "!";
+        if(auctionWinner){
+          let auctionWinnerBetAmount = this.prevGameState.players.find(x => auctionWinner && x.id == auctionWinner.id).money - auctionWinner.money;
+          this.msgAuctionWinner = '<span class="Player-Background-' + auctionWinner.color + '">' + auctionWinner.name + '</span>' + " won the auction for " + auctionedProperty.name + " in the amount of $" + auctionWinnerBetAmount + "!";
+        }
       } else if (this.gameState.auction) {
         this.msgAuctionWinner = undefined;
       }
@@ -705,7 +723,7 @@ export class InteractionsComponent implements OnInit {
   private canViewOffers(): void {
     this.viewOffersBtnEnabled =
       this.gameState.tradeOffers.length > 0 &&
-      this.offers.length > 0 && !this.playerMoveInProgress;
+      this.offers.length > 0;
   }
 
   private canTrade(): void {
@@ -719,7 +737,7 @@ export class InteractionsComponent implements OnInit {
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
     let canBuild = false;
 
-    if (this.isPlayersTurn() && !this.playerMoveInProgress && ownedProperties.length > 1) {
+    if (this.isPlayersTurn() && ownedProperties.length > 1) {
       let coloredProperties = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
       coloredProperties = _.groupBy(coloredProperties, 'color');
       canBuild = Object.keys(coloredProperties).some(key =>
@@ -735,7 +753,7 @@ export class InteractionsComponent implements OnInit {
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
     let canSell = false;
 
-    if (this.isPlayersTurn() && !this.playerMoveInProgress && ownedProperties.length > 1) {
+    if (this.isPlayersTurn() && ownedProperties.length > 1) {
       let coloredProperties = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
       coloredProperties = _.groupBy(coloredProperties, 'color');
       canSell = Object.keys(coloredProperties).some(key =>
@@ -753,7 +771,7 @@ export class InteractionsComponent implements OnInit {
     canMortgage = this.isPlayersTurn() &&
       ownedProperties.length > 0 &&
       ownedProperties.some(x => !x.isMortgaged) &&
-      !this.gameState.auctionInProgress && !this.playerMoveInProgress;
+      !this.gameState.auctionInProgress;
 
     if (canMortgage) {
       let coloredPropertyGroups = this.gameState.tiles.filter(x => x.type == 'ColorProperty');
@@ -774,7 +792,6 @@ export class InteractionsComponent implements OnInit {
     let ownedProperties = this.getOwnedProperties(this.gamePlayerId);
 
     this.redeemBtnEnabled = (this.isPlayersTurn() &&
-      !this.playerMoveInProgress &&
       ownedProperties.length > 0 &&
       (ownedProperties.some(x => x.isMortgaged)));
   }
@@ -782,14 +799,14 @@ export class InteractionsComponent implements OnInit {
   private canPayJailFee(): void {
     this.payJailFeeBtnEnabled = this.isPlayersTurn() &&
       this.gameState.currentPlayer.isInJail
-      && !this.gameState.currentPlayer.currentDiceRoll && !this.playerMoveInProgress;
+      && !this.gameState.currentPlayer.currentDiceRoll;
   }
 
   private canGetOutOfJailFree(): void {
     this.getOutOfJailFreeBtnEnabled = this.isPlayersTurn() &&
       this.gameState.currentPlayer.isInJail &&
       this.gameState.currentPlayer.hasGetOutOfJailFreeCard  && 
-      !this.gameState.currentPlayer.currentDiceRoll && !this.playerMoveInProgress;
+      !this.gameState.currentPlayer.currentDiceRoll;
   }
 
   private canRollDice(): void {

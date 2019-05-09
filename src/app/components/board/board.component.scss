@@ -14,8 +14,6 @@
   $height_size: $width_size * 1.58;
   $drawing-size: 5vmin;
 
-
-
   // =================
   // GLOBAL
   // =================
@@ -260,6 +258,14 @@
   }
 
   .railroad {
+    .container {
+      .info {
+        .game-piece {
+          top: 57%;
+        }
+      }
+    }
+
     .drawing {
       font-size: $drawing-size * 0.9;
       color: $black;
@@ -287,16 +293,23 @@
   }
 
   .utility {
-    .name {
-      padding-top: 10px;
-    }
-
-    .drawing {
-      font-size: $drawing-size;
+    .container {
+      .info {
+        .game-piece {
+          top: 56%;
+        }
+      }
     }
   }
 
   .fee {
+    .container {
+      .info {
+        .game-piece {
+          top: 57%;
+        }
+      }
+    }
     .name {
       padding-top: 10px;
       font-size: 2vmin;
@@ -449,6 +462,11 @@
   .chance {
     .container {
       justify-content: center;
+      .info {
+        .game-piece {
+          top: 57%;
+        }
+      }
     }
 
     .drawing {
@@ -472,6 +490,11 @@
   .community-chest {
     .container {
       justify-content: space-around;
+      .info {
+        .game-piece {
+          top: 57%;
+        }
+      }
     }
 
     .drawing {
@@ -561,11 +584,10 @@
     border: 2px solid black;
   }
 
-
   .game-piece {
     width: 3vmin;
     height: 3vmin;
-    top: 30%;
+    top: 46%;
     position: absolute;
     filter: brightness(1.15);
     z-index: 1000;
@@ -574,7 +596,7 @@
   }
 
   .player-0 {
-    right: 10%
+    right: 10%;
   }
 
   .player-1 {
@@ -838,7 +860,7 @@
   .hotel-container {
     margin-top: 10px;
     display: block;
-    color: #AF1A28;
+    color: #af1a28;
     fa-icon {
       width: 3vmin;
     }

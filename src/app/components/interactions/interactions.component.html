@@ -50,7 +50,7 @@
           Chance/Com. Chest
         </div>
         <div class="card-body"
-          *ngIf="(gameState.chanceDeck.currentPlayerCardText || gameState.communityChestDeck.currentPlayerCardText) && !playerMoveInProgress">
+          *ngIf="((gameState.chanceDeck.currentPlayerCardText || gameState.communityChestDeck.currentPlayerCardText) && !playerMoveInProgress) || showCommChanceCard">
           <p class="card-title">
             {{gameState.chanceDeck.currentPlayerCardText ? 'Chance' : gameState.communityChestDeck.currentPlayerCardText ? 'Community Chest' : ''}}
           </p>
@@ -116,7 +116,7 @@
             (click)="openTradeModal(tradeModalContent)">Trade</button>
           <button type="button" class="btn btn-lg btn-primary"
             [ngClass]="!viewOffersBtnEnabled ? 'disabled': 'offers-btn active'"
-            (click)="openTradeOffersModal(tradeOffersModalContent)">Offers</button>
+            (click)="openTradeOffersModal(tradeOffersModalContent)">{{offers.length === 1 ? '1 Offer' : offers.length + ' Offers'}}</button>
         </div>
         <div class="row align-items-center justify-content-around">
           <button type="button" class="btn btn-lg btn-warning"
